@@ -131,13 +131,8 @@ var creatureFactory = (function () {
     register: function (options, init) {
       // required attributes
       var type = options.type;
-      var color = options.color;
       // only register classes that fulfill the creature contract
-      if (typeof type === 'string' &&
-          typeof types[type] === 'undefined' &&
-          typeof color === 'object' &&
-          color.length === 3) {
-
+      if (typeof type === 'string' && typeof types[type] === 'undefined') {
         // set the constructor, including init if it's defined
         if (typeof init === 'function') {
           types[type] = function () {
@@ -148,6 +143,12 @@ var creatureFactory = (function () {
           types[type] = function () {
             this.energy = this.initialEnergy;
           };
+        }
+
+        var color = options.color;
+        // set the color randomly if none is provided
+        if (typeof color !== 'object' || color.length !== 3) {
+          options.color = [_.random(255), _.random(255), _.random(255)];
         }
 
         types[type].prototype = new baseCreature();

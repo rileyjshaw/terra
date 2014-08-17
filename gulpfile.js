@@ -14,8 +14,16 @@ var paths = {
   demo: {
     entry: './demo/scripts/main.js',
     scripts: './demo/scripts/**/*.js',
-    stylesheets: ['./demo/stylesheets/**/*.css', './demo/stylesheets/**/*.sass'],
-    extras: './*.{png,ico,txt,xml}'
+    extraScripts: [
+      './bower_components/smooth-scroll.js/dist/js/bind-polyfill.min.js',
+      './bower_components/smooth-scroll.js/dist/js/smooth-scroll.min.js',
+      './demo/scripts/prism.js'
+    ],
+    stylesheets: {
+      css: './demo/stylesheets/**/*.css',
+      sass: './demo/stylesheets/**/*.sass'
+    },
+    temp: './demo/temp'
   },
   dist: {
     scripts: './dist',
@@ -53,23 +61,35 @@ gulp.task('demo', function() {
       debug: argv.debug
     })
     .bundle()
-    .pipe(source('terra.demo.min.js'))
+    .pipe(source('temp.js'))
+    .pipe(gulp.dest(paths.demo.temp))
+});
+
+gulp.task('sass', function () {
+  return gulp.src(paths.demo.stylesheets.sass)
+    .pipe($.rubySass())
+    .pipe($.autoprefixer())
+    .pipe(gulp.dest(paths.demo.temp))
+});
+
+gulp.task('js_concat', ['demo'], function () {
+  return gulp.src(paths.demo.extraScripts.concat(paths.demo.temp + '/*.js'))
+    .pipe($.concat('terra.demo.min.js'))
     .pipe($.streamify( $.uglify() ))
     .pipe(gulp.dest(paths.dist.demo))
 });
 
-gulp.task('sass', function () {
-  return gulp.src(paths.demo.stylesheets)
-    .pipe($.rubySass())
-    .pipe($.autoprefixer())
+gulp.task('css_concat', ['sass'], function () {
+  return gulp.src([paths.demo.stylesheets.css, paths.demo.temp + '/*.css'])
+    .pipe($.concat('main.css'))
     .pipe($.minifyCss())
     .pipe(gulp.dest(paths.dist.demo))
 });
 
 gulp.task('watch', function() {
   gulp.watch([paths.app.all, paths.app.ext], ['lint', 'scripts']);
-  gulp.watch(paths.demo.scripts, ['demo']);
-  gulp.watch(paths.demo.stylesheets, ['sass']);
+  gulp.watch(paths.demo.scripts, ['demo','js_concat']);
+  gulp.watch([paths.demo.stylesheets.sass, paths.demo.stylesheets.css], ['sass', 'css_concat']);
 });
 
 gulp.task('deploy', function () {
@@ -86,4 +106,4 @@ gulp.task('webserver', function() {
     }));
 });
 
-gulp.task( 'default', [ 'lint', 'scripts', 'demo', 'sass', 'webserver', 'watch' ] );
+gulp.task( 'default', [ 'lint', 'scripts', 'demo', 'js_concat', 'sass', 'css_concat', 'webserver', 'watch' ] );
