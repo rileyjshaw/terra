@@ -27,9 +27,6 @@
     "lodash_custom",
     "node_modules",
     "tests",
-    "index.html",
-    "main.css",
-    "terra.demo.min.js",
     "gulpfile.js"
   ],
   "dependencies": {

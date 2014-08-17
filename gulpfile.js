@@ -12,14 +12,14 @@ var paths = {
     ext: ['./bower_components/**/*.js', './lodash_custom/**/*.js']
   },
   demo: {
-    entry: ['./demo/scripts/main.js'],
-    scripts: ['./demo/scripts/**/*.js'],
+    entry: './demo/scripts/main.js',
+    scripts: './demo/scripts/**/*.js',
     stylesheets: ['./demo/stylesheets/**/*.css', './demo/stylesheets/**/*.sass'],
-    extras: ['./*.{png,ico,txt,xml}']
+    extras: './*.{png,ico,txt,xml}'
   },
   dist: {
     scripts: './dist',
-    demo: './'
+    demo: './demo'
   },
   tests: './tests'
 };
@@ -72,4 +72,18 @@ gulp.task('watch', function() {
   gulp.watch(paths.demo.stylesheets, ['sass']);
 });
 
-gulp.task( 'default', [ 'lint', 'scripts', 'demo', 'sass', 'watch' ] );
+gulp.task('deploy', function () {
+  gulp.src(paths.dist.demo + '/*.*')
+    .pipe($.ghPages('https://github.com/rileyjshaw/terra.git', 'origin'));
+});
+
+gulp.task('webserver', function() {
+  gulp.src(paths.dist.demo)
+    .pipe($.webserver({
+      host: '0.0.0.0',
+      livereload: true,
+      open: true
+    }));
+});
+
+gulp.task( 'default', [ 'lint', 'scripts', 'demo', 'sass', 'webserver', 'watch' ] );
