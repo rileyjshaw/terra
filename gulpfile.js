@@ -1,56 +1,75 @@
-var
-  gulp = require('gulp'),
-  jshint = require('gulp-jshint'),
-  mocha = require('gulp-mocha'),
-  stripDebug = require('gulp-strip-debug'),
-  concat = require('gulp-concat'),
-  uglify = require('gulp-uglify'),
-  rename = require('gulp-rename');
-  sass = require('gulp-ruby-sass'),
-  autoprefixer = require('gulp-autoprefixer'),
-  minifyCSS = require('gulp-minify-css');
+var gulp = require('gulp');
+var $ = require('gulp-load-plugins')({lazy: false});
+var source = require('vinyl-source-stream');
+var browserify = require('browserify');
+
+var argv = require('minimist')(process.argv.slice(2));
 
 var paths = {
-  src: {
-    firstScripts: [ 'node_modules/lodash/lodash.js', 'scripts/terra.js', 'scripts/terra.util.js' ],
-    scripts: 'scripts/*.js',
-    tests: 'tests/*.js',
-    stylesheets: 'stylesheets/*.sass'
-  }
+  app: {
+    entry: './app/main.js',
+    all: './app/**/*.js',
+    ext: ['./bower_components/**/*.js', './lodash_custom/**/*.js']
+  },
+  demo: {
+    entry: ['./demo/scripts/main.js'],
+    scripts: ['./demo/scripts/**/*.js'],
+    stylesheets: ['./demo/stylesheets/**/*.css', './demo/stylesheets/**/*.sass'],
+    extras: ['./*.{png,ico,txt,xml}']
+  },
+  dist: {
+    scripts: './dist',
+    demo: './'
+  },
+  tests: './tests'
 };
 
 gulp.task('lint', function() {
-  return gulp.src(paths.src.scripts)
-    .pipe(jshint())
-    .pipe(jshint.reporter('default'));
+  return gulp.src(paths.app.all)
+    .pipe($.jshint())
+    .pipe($.jshint.reporter('default'));
 });
 
 gulp.task('test', function() {
-  return gulp.src(paths.src.tests)
-    .pipe( mocha( { reporter: 'spec' } ) )
+  return gulp.src(paths.tests)
+    .pipe( $.mocha( { reporter: 'spec' } ) )
 });
 
-gulp.task('scripts', function() {
-  return gulp.src( [ paths.src.firstScripts[0], paths.src.firstScripts[1], paths.src.firstScripts[2], paths.src.scripts ] )
-    .pipe(stripDebug())
-    .pipe(concat('all.js'))
-    .pipe(gulp.dest('dist'))
-    .pipe(rename('all.min.js'))
-    .pipe(uglify( { outSourceMap: true } ))
-    .pipe(gulp.dest('dist'));
+gulp.task('scripts', ['lint'], function() {
+  return browserify(paths.app.entry, {
+      debug: argv.debug,
+      standalone: 'terra'
+    })
+    .bundle()
+    .pipe(source('terra.js'))
+    .pipe(gulp.dest(paths.dist.scripts))
+    .pipe($.rename('terra.min.js'))
+    .pipe($.streamify( $.uglify() ))
+    .pipe(gulp.dest(paths.dist.scripts))
+});
+
+gulp.task('demo', function() {
+  return browserify(paths.demo.entry, {
+      debug: argv.debug
+    })
+    .bundle()
+    .pipe(source('terra.demo.min.js'))
+    .pipe($.streamify( $.uglify() ))
+    .pipe(gulp.dest(paths.dist.demo))
 });
 
 gulp.task('sass', function () {
-  return gulp.src(paths.src.stylesheets)
-    .pipe(sass())
-    .pipe(autoprefixer())
-    .pipe(minifyCSS())
-    .pipe(gulp.dest('dist'))
+  return gulp.src(paths.demo.stylesheets)
+    .pipe($.rubySass())
+    .pipe($.autoprefixer())
+    .pipe($.minifyCss())
+    .pipe(gulp.dest(paths.dist.demo))
 });
 
 gulp.task('watch', function() {
-  gulp.watch(paths.src.scripts, ['lint', 'scripts']);
-  gulp.watch(paths.src.stylesheets, ['sass']);
+  gulp.watch([paths.app.all, paths.app.ext], ['lint', 'scripts']);
+  gulp.watch(paths.demo.scripts, ['demo']);
+  gulp.watch(paths.demo.stylesheets, ['sass']);
 });
 
-gulp.task( 'default', [ 'lint', 'scripts', 'sass', 'watch' ] );
+gulp.task( 'default', [ 'lint', 'scripts', 'demo', 'sass', 'watch' ] );

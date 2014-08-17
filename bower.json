@@ -1,0 +1,38 @@
+{
+  "name": "terra",
+  "version": "0.0.2-alpha",
+  "homepage": "https://github.com/rileyjshaw/terra",
+  "authors": [
+    "rileyjshaw <i@rileyjshaw.com>"
+  ],
+  "description": "A JavaScript framework for simple biological simulations and cellular automata.",
+  "main": "dist/terra.min.js",
+  "moduleType": [
+    "node"
+  ],
+  "keywords": [
+    "terrarium",
+    "sumulator",
+    "cellular",
+    "automata",
+    "biology"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "app",
+    "bower_components",
+    "demo",
+    "lodash_custom",
+    "node_modules",
+    "tests",
+    "index.html",
+    "main.css",
+    "terra.demo.min.js",
+    "gulpfile.js"
+  ],
+  "dependencies": {
+    "seedrandom": "~2.3.6"
+  }
+}
