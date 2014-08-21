@@ -12,7 +12,7 @@
     <header id="header">
       <h1>terra.js <span>alpha</span></h1>
       <p>A JavaScript framework for simple biological simulations and cellular automata.</p>
-      <a data-scroll href="#main" class="downArrow">⬇</a>
+      <a data-scroll href="#main" id="scroller1" class="downArrow">⬇</a>
     </header>
   </div>
 
@@ -22,7 +22,6 @@
       <li><a data-scroll href="#examples">Examples</a></li>
       <li><a data-scroll href="#options">Options</a></li>
       <li><a data-scroll href="#methods">Methods</a></li>
-      <li><a data-scroll href="#events">Events</a></li>
       <li><a href="https://github.com/rileyjshaw/terra">GitHub</a></li>
     </ul>
   </nav>
@@ -38,50 +37,34 @@
     <p>terra can also be used as a module with most popular module systems. <a class="question" target="_blank" href="https://github.com/umdjs/umd">?</a></p>
 
     <h3>Creating creatures</h3>
-    <p>Now that we've included the script, let's create a simple creature using the creatureFactory. Each creature requires a type.</p>
+    <p>Let's create a simple creature using the creatureFactory. Each creature requires a type.</p>
     <pre><code class="language-javascript">terra.creatureFactory.register({
   type: 'firstCreature'
 });</code></pre>
     <p>This creature is valid, but it's pretty boring. To make a more interesting creature, let's override some of the default <a data-scroll href="#options">options</a> and <a data-scroll href="#methods">methods</a>.</p>
     <pre><code class="language-javascript">terra.creatureFactory.register({
   type: 'secondCreature',
-  color: [41, 128, 185],
-  metabolism: 1,
-  sustainability: 3,
-  reproduceLv: 0.60,
-  etc...
+  color: [120, 0, 240],
+  sustainability: 6,
+  reproduceLv: 1
 });</code></pre>
-  <p>We've just created a creature that will ____.</p>
+    <p>We've just created a purple creature that only eats if 6 or more plants are around it. These creatures basically seek out an edge or corner and die there.</p>
 
-  <h3>Creating the environment</h3>
-  <p>To run a simulation, we'll need to create an environment. Let's make a 25x25 grid and populate 40% of the space with our first creature and 20% with our second.</p>
-  <pre><code class="language-javascript">var ex1 = new terra.Terrarium(25, 25, 'ex1');
-ex1.populate([['firstCreature', 40], ['secondCreature', 20]]);</code></pre>
+    <h3>Creating the environment</h3>
+    <p>To run a simulation, we'll need to create an environment. Let's make a 25x25 grid, populate 10% of the space with our lonely purple creature, and fill the rest with simple plants.</p>
+    <pre><code class="language-javascript">var ex1 = new terra.Terrarium(25, 25, 'ex1');
+  ex1.populate([['secondCreature', 10], ['simplePlant', 90]]);</code></pre>
 
-  <h3>Running a simulation</h3>
+    <h3>Running a simulation</h3>
 
-  <p>Terrariums have a few methods that allow you to interact with the simulation. The most important are <code class="language-javascript">step</code> and <code class="language-javascript">draw</code>.</p>
-  <pre><code class="language-javascript">function stepAndDraw () {
-  // run the next step of the simulation
-  ex1.step();
-  // update its display
-  ex1.draw();
-}
+    <p>Terrariums have a few methods that allow you to interact with the simulation. Let's animate it and see how it does for the first 300 steps.</p>
+    <pre id="ex1End"><code class="language-javascript">ex1.animate(300);</code></pre>
 
-// start an interval to update the simulation twice per second
-var updater = setInterval(stepAndDraw, 500);</code></pre>
-
-  <p><code class="language-javascript">step</code> can take an argument for the number of steps to run through. If we want to see how our environment is doing in 1000 steps, we can simply run:</p>
-  <pre><code class="language-javascript">ex1.step(1000);
-ex1.draw();</code></pre>
-
-
-
+    <p>That's all there is to it! Though it's possible to generate complex behaviours by simply overriding default values, the real fun comes when you realize that <a data-scroll href="#">the creature constructor is fully customizable</a>...</p>
 
     <h2 id="examples">Examples</h2>
 
     <h3 id="gol">Conway's Game of Life <a class="question" target="_blank" href="http://en.wikipedia.org/wiki/Conway's_Game_of_Life">?</a></h3>
-    <p>terra can also run cellular automata. </p>
     <pre><code class="language-javascript">terra.creatureFactory.register({
   type: 'GoL',
   colorFn: function () { return this.alive ? this.color + ',1' : '0,0,0,0'; },
@@ -91,67 +74,111 @@ ex1.draw();</code></pre>
     var surrounding = _.filter(neighbors, function (spot) {
       return spot.creature.alive;
     }).length;
-    this.alive = surrounding === 3 || surrounding === 2 && this.alive;
+    this.alive = surrounding === 3 || surrounding === 2 &amp;&amp; this.alive;
     return false;
   }
 }, function () {
-  this.alive = Math.random() < 0.5;
+  this.alive = Math.random() &lt; 0.5;
 });</code></pre>
 
-    <h3 id="cyclic">Cyclic Cellular Automata</h3>
+    <h3 id="cyclic">Cyclic Cellular Automaton <a class="question" target="_blank" href="http://en.wikipedia.org/wiki/Cyclic_cellular_automaton">?</a></h3>
     <pre><code class="language-javascript">terra.creatureFactory.register({
   type: 'cyclic',
-  colors: ['255,0,0,1', '255,217,0,1', '72,255,0,1', '0,255,145,1', '0,145,255,1', '72,0,255,1', '255,0,217,1'],
+  colors: ['255,0,0,1', '255,96,0,1', '255,191,0,1', '223,255,0,1', '128,255,0,1', '32,255,0,1', '0,255,64,1', '0,255,159,1', '0,255,255,1', '0,159,255,1', '0,64,255,1', '32,0,255,1', '127,0,255,1', '223,0,255,1', '255,0,191,1', '255,0,96,1'],
   colorFn: function () { return this.colors[this.state];},
   wait: function () {},
   isDead: function () { return false; },
   queue: function (neighbors) {
-    var next = (this.state + 1) % 7;
+    var next = (this.state + 1) % 16;
     var changing = _.some(neighbors, function (spot) {
       return spot.creature.state === next;
     });
     if (changing) this.state = next;
   }
 }, function () {
-  this.state = Math.floor(Math.random() * 7);
+  this.state = Math.floor(Math.random() * 16);
 });</code></pre>
 
-    <h2 id="options">Options</h2>
-    <p>The following options can be passed in an object to creatureFactory.register( ) as the first argument.</p>
+    <h2 id="options">Default Options</h2>
+    <p>The following options can be passed in an object to terra.creatureFactory.register( ) as the first argument.</p>
 
     <h3>Required</h3>
-    <ul>
-      <li>(string) type: </li>
+    <ul class="defaults">
+      <li>
+        <h4><span class="token keyword">string</span> type</h4>
+        <p>Creature type, to be used later in <a data-scroll href="#populate" class="token function">populate( )</a>.</p>
+      </li>
     </ul>
 
     <h3>Optional</h3>
-    <ul>
-      <li>(array) color: </li>
-      <li>(int) initialEnergy: </li>
-      <li>(int) maxEnergy: </li>
-      <li>(int) metabolism: </li>
-      <li>(int) size: </li>
-      <li>(int) speed: </li>
-      <li>(int) vision: </li>
-      <li>(int) sustainability: 2</li>
-      <li>(float) reproduceLv: 0.70</li>
-      <li>(float) moveLv: 0.20</li>
-      <li>(char) character: </li>
+    <ul class="defaults">
+      <li>
+        <h4><span class="token keyword">int [3]</span> color</h4>
+        <p>RGB components of a creature's display color.</p>
+        <ul>
+          <li>Range: [0, 255]</li>
+          <li>Default: random</li>
+        </ul>
+      </li>
+      <li>
+        <h4><span class="token keyword">float</span> initialEnergy</h4>
+        <p>Energy level that a creature has at the start of its life.
+        <ul>
+          <li>Range: (0, maxEnergy]</li>
+          <li>Default: 50</li>
+        </ul>
+      </li>
+      <li>
+        <h4><span class="token keyword">float</span> maxEnergy</h4>
+        <p>Maximum energy that a creature can have; excess energy is discarded.</p>
+        <ul>
+          <li>Default: 100</li>
+          <li>Minimum: 0</li>
+        </ul>
+      </li>
+      <li>
+        <h4><span class="token keyword">int</span> metabolism</h4>
+        <p></p>
+      </li>
+      <li>
+        <h4><span class="token keyword">int</span> size</h4>
+        <p></p>
+      </li>
+      <li>
+        <h4><span class="token keyword">int</span> actionRadius</h4>
+        <p>Defines a creature's vision and movement range for each step.</p>
+        <ul>
+          <li>Default: 1</li>
+          <li>Minimum: 1</li>
+        </ul>
+      </li>
+      <li>
+        <h4><span class="token keyword">int</span> sustainability: </h4>
+        <p>Amount of visible food sources required for a creature to eat. Default: 2.</p>
+      </li>
+      <li>
+        <h4><span class="token keyword">float</span> reproduceLv: 0.7</h4>
+        <p></p>
+      </li>
+      <li>
+        <h4><span class="token keyword">float</span> moveLv: 0.2</h4>
+        <p></p>
+      </li>
+      <li>
+        <h4><span class="token keyword">char</span> character</h4>
+        <p></p>
+      </li>
     </ul>
 
     <h2 id="methods">Methods</h2>
-    <ul>
+    <ul class="defaults">
       <li>queue</li>
       <li>reproduce</li>
       <li>move</li>
       <li>wait</li>
       <li>isDead</li>
       <li>boundEnergy</li>
-    </ul>
-
-    <h2 id="events">Events</h2>
-    <ul>
-      <li>finished</li>
+      <li>colorFn</li>
     </ul>
 
   </div>
