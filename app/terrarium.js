@@ -9,6 +9,7 @@ function Terrarium(width, height, id, cellSize, insertAfter) {
   this.cellSize = cellSize || 10;
   this.grid = [];
   this.canvas = dom.createCanvasElement(width * cellSize, height * cellSize, id, insertAfter);
+  this.nextFrame = false;
 }
 
 Terrarium.prototype.populate = function (creatures, grid) {
@@ -71,7 +72,7 @@ Terrarium.prototype.step = function(steps) {
   function processCreaturesInner (creature, x, y) {
     if (creature) {
       var neighbors = _.map(
-        _.getNeighborCoords(x, y, gridWidth - 1, gridHeight - 1, creature.vision),
+        _.getNeighborCoords(x, y, gridWidth - 1, gridHeight - 1, creature.actionRadius),
         zipCoordsWithNeighbors
       );
       var result = creature.queue(neighbors);
@@ -146,8 +147,31 @@ Terrarium.prototype.step = function(steps) {
   return newGrid;
 };
 
-Terrarium.prototype.draw = function() {
+Terrarium.prototype.draw = function () {
   display(this.canvas, this.grid, this.cellSize);
+};
+
+Terrarium.prototype.animate = function (steps, fn) {
+  function tick () {
+    self.grid = self.step();
+    self.draw();
+    if (i++ !== steps) self.nextFrame = requestAnimationFrame(tick);
+    else {
+      self.nextFrame = false;
+      fn();
+    }
+  }
+
+  if (!this.nextFrame) {
+    var i = 0;
+    var self = this;
+    self.nextFrame = requestAnimationFrame(tick);
+  }
+};
+
+Terrarium.prototype.stop = function () {
+  cancelAnimationFrame(this.nextFrame);
+  this.nextFrame = false;
 };
 
 module.exports = Terrarium;

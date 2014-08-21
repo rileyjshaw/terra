@@ -18,10 +18,9 @@ var creatureFactory = (function () {
 
   baseCreature.prototype.initialEnergy = 50;
   baseCreature.prototype.maxEnergy = 100;
-  baseCreature.prototype.metabolism = 0.7;
+  baseCreature.prototype.efficiency = 0.7;
   baseCreature.prototype.size = 50;
-  baseCreature.prototype.speed = 1;
-  baseCreature.prototype.vision = 1;
+  baseCreature.prototype.actionRadius = 1;
   baseCreature.prototype.sustainability = 2;
   // used as percentages of maxEnergy
   baseCreature.prototype.reproduceLv = 0.70;
@@ -85,7 +84,7 @@ var creatureFactory = (function () {
       var coords = step.coords;
 
       var successFn = (function () {
-        var foodEnergy = step.creature.energy * this.metabolism;
+        var foodEnergy = step.creature.energy * this.efficiency;
         this.energy = this.energy + (foodEnergy || -10);
         // clear the original location
         return false;
@@ -262,6 +261,7 @@ function Terrarium(width, height, id, cellSize, insertAfter) {
   this.cellSize = cellSize || 10;
   this.grid = [];
   this.canvas = dom.createCanvasElement(width * cellSize, height * cellSize, id, insertAfter);
+  this.nextFrame = false;
 }
 
 Terrarium.prototype.populate = function (creatures, grid) {
@@ -324,7 +324,7 @@ Terrarium.prototype.step = function(steps) {
   function processCreaturesInner (creature, x, y) {
     if (creature) {
       var neighbors = _.map(
-        _.getNeighborCoords(x, y, gridWidth - 1, gridHeight - 1, creature.vision),
+        _.getNeighborCoords(x, y, gridWidth - 1, gridHeight - 1, creature.actionRadius),
         zipCoordsWithNeighbors
       );
       var result = creature.queue(neighbors);
@@ -399,8 +399,31 @@ Terrarium.prototype.step = function(steps) {
   return newGrid;
 };
 
-Terrarium.prototype.draw = function() {
+Terrarium.prototype.draw = function () {
   display(this.canvas, this.grid, this.cellSize);
+};
+
+Terrarium.prototype.animate = function (steps, fn) {
+  function tick () {
+    self.grid = self.step();
+    self.draw();
+    if (i++ !== steps) self.nextFrame = requestAnimationFrame(tick);
+    else {
+      self.nextFrame = false;
+      fn();
+    }
+  }
+
+  if (!this.nextFrame) {
+    var i = 0;
+    var self = this;
+    self.nextFrame = requestAnimationFrame(tick);
+  }
+};
+
+Terrarium.prototype.stop = function () {
+  cancelAnimationFrame(this.nextFrame);
+  this.nextFrame = false;
 };
 
 module.exports = Terrarium;
