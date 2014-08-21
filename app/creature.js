@@ -8,10 +8,9 @@ var creatureFactory = (function () {
 
   baseCreature.prototype.initialEnergy = 50;
   baseCreature.prototype.maxEnergy = 100;
-  baseCreature.prototype.metabolism = 0.7;
+  baseCreature.prototype.efficiency = 0.7;
   baseCreature.prototype.size = 50;
-  baseCreature.prototype.speed = 1;
-  baseCreature.prototype.vision = 1;
+  baseCreature.prototype.actionRadius = 1;
   baseCreature.prototype.sustainability = 2;
   // used as percentages of maxEnergy
   baseCreature.prototype.reproduceLv = 0.70;
@@ -75,7 +74,7 @@ var creatureFactory = (function () {
       var coords = step.coords;
 
       var successFn = (function () {
-        var foodEnergy = step.creature.energy * this.metabolism;
+        var foodEnergy = step.creature.energy * this.efficiency;
         this.energy = this.energy + (foodEnergy || -10);
         // clear the original location
         return false;
