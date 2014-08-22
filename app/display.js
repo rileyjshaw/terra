@@ -1,6 +1,6 @@
 var _ = require('./util.js');
 
-module.exports = function(canvas, grid, cellSize) {
+module.exports = function (canvas, grid, cellSize) {
   var ctx = canvas.getContext('2d');
   ctx.font = 'bold ' + cellSize + 'px Arial';
   ctx.clearRect(0, 0, canvas.width, canvas.height);

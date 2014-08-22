@@ -85,6 +85,7 @@ var creatureFactory = (function () {
 
       var successFn = (function () {
         var foodEnergy = step.creature.energy * this.efficiency;
+        // add foodEnergy if eating, subtract 10 if moving
         this.energy = this.energy + (foodEnergy || -10);
         // clear the original location
         return false;
@@ -99,7 +100,7 @@ var creatureFactory = (function () {
     } else return false;
   };
 
-  baseCreature.prototype.wait = function (neighbors) {
+  baseCreature.prototype.wait = function () {
     this.energy -= 5;
     return true;
   };
@@ -108,9 +109,9 @@ var creatureFactory = (function () {
     var step = {};
     var maxEnergy = this.maxEnergy;
 
-    if (this.energy > this.maxEnergy * this.reproduceLv && this.reproduce) {
+    if (this.energy > maxEnergy * this.reproduceLv && this.reproduce) {
       step = this.reproduce(neighbors);
-    } else if (this.energy > this.moveLv && this.move) {
+    } else if (this.energy > maxEnergy * this.moveLv && this.move) {
       step = this.move(neighbors);
     }
 
@@ -182,7 +183,7 @@ module.exports = creatureFactory;
 },{"./util.js":6}],3:[function(require,module,exports){
 var _ = require('./util.js');
 
-module.exports = function(canvas, grid, cellSize) {
+module.exports = function (canvas, grid, cellSize) {
   var ctx = canvas.getContext('2d');
   ctx.font = 'bold ' + cellSize + 'px Arial';
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -232,7 +233,7 @@ var createCanvasElement = function (width, height, id, insertAfter) {
     canvas.style.width = width + 'px';
     canvas.style.height = height + 'px';
     canvas.getContext('2d').setTransform(ratio, 0, 0, ratio, 0, 0);
-    canvas.id = id;
+    if (id) canvas.id = id;
 
     return canvas;
   }
@@ -255,6 +256,14 @@ var creatureFactory = require('./creature.js');
 var display = require('./display.js');
 var dom = require('./dom.js');
 
+/**
+ * Terrarium constructor function
+ * @param {int} width             number of cells in the x-direction
+ * @param {int} height            number of cells in the y-direction
+ * @param {string} id             id assigned to the generated canvas
+ * @param {int} cellSize          pixel width of each cell (default 10)
+ * @param {string} insertAfter    id of the element to insert the canvas after
+ */
 function Terrarium(width, height, id, cellSize, insertAfter) {
   this.width = width;
   this.height = height;
@@ -264,6 +273,11 @@ function Terrarium(width, height, id, cellSize, insertAfter) {
   this.nextFrame = false;
 }
 
+/**
+ * Populates a terrarium with a set distribution of creatures
+ * @param  {array} creatures  an array of arrays of the form [string 'creatureName', int fillPercent]
+ * @param  {[type]} grid      the grid to fill
+ */
 Terrarium.prototype.populate = function (creatures, grid) {
   function pickCreature(accum, creature) {
     var percentage = accum + creature[1];
@@ -283,7 +297,7 @@ Terrarium.prototype.populate = function (creatures, grid) {
     if (creatures) {
       for (var y = this.height; y--;) {
         current = false;
-        rand = _.random(99, true);
+        rand = _.random(100, true);
         _.reduce(creatures, pickCreature, 0);
         grid[x].push(current);
       }
@@ -291,7 +305,12 @@ Terrarium.prototype.populate = function (creatures, grid) {
   }
 };
 
-Terrarium.prototype.step = function(steps) {
+/**
+ * Returns the next step of the simulation
+ * @param  {} steps   the number of steps to run through before returning
+ * @return {grid}     a new grid after <steps> || 1 steps
+ */
+Terrarium.prototype.step = function (steps) {
   function copyAndRemoveInner (origCreature) {
     if (origCreature) {
       var copy = _.assign(new (origCreature.constructor)(), origCreature);
@@ -399,10 +418,18 @@ Terrarium.prototype.step = function(steps) {
   return newGrid;
 };
 
+/**
+ * Updates the canvas to reflect the current grid
+ */
 Terrarium.prototype.draw = function () {
   display(this.canvas, this.grid, this.cellSize);
 };
 
+/**
+ * Starts animating the simulation
+ * @param  {int}   steps   the simulation will stop after <steps> steps if specified
+ * @param  {Function} fn   called as a callback once the animation finishes
+ */
 Terrarium.prototype.animate = function (steps, fn) {
   function tick () {
     self.grid = self.step();
@@ -421,6 +448,9 @@ Terrarium.prototype.animate = function (steps, fn) {
   }
 };
 
+/**
+ * Stops a currently running animation
+ */
 Terrarium.prototype.stop = function () {
   cancelAnimationFrame(this.nextFrame);
   this.nextFrame = false;
