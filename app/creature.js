@@ -75,6 +75,7 @@ var creatureFactory = (function () {
 
       var successFn = (function () {
         var foodEnergy = step.creature.energy * this.efficiency;
+        // add foodEnergy if eating, subtract 10 if moving
         this.energy = this.energy + (foodEnergy || -10);
         // clear the original location
         return false;
@@ -89,7 +90,7 @@ var creatureFactory = (function () {
     } else return false;
   };
 
-  baseCreature.prototype.wait = function (neighbors) {
+  baseCreature.prototype.wait = function () {
     this.energy -= 5;
     return true;
   };
@@ -98,9 +99,9 @@ var creatureFactory = (function () {
     var step = {};
     var maxEnergy = this.maxEnergy;
 
-    if (this.energy > this.maxEnergy * this.reproduceLv && this.reproduce) {
+    if (this.energy > maxEnergy * this.reproduceLv && this.reproduce) {
       step = this.reproduce(neighbors);
-    } else if (this.energy > this.moveLv && this.move) {
+    } else if (this.energy > maxEnergy * this.moveLv && this.move) {
       step = this.move(neighbors);
     }
 
