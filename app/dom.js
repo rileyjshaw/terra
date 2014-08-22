@@ -23,7 +23,7 @@ var createCanvasElement = function (width, height, id, insertAfter) {
     canvas.style.width = width + 'px';
     canvas.style.height = height + 'px';
     canvas.getContext('2d').setTransform(ratio, 0, 0, ratio, 0, 0);
-    canvas.id = id;
+    if (id) canvas.id = id;
 
     return canvas;
   }
