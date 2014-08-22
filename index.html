@@ -20,8 +20,8 @@
     <ul>
       <li><a data-scroll href="#usage">Usage</a></li>
       <li><a data-scroll href="#examples">Examples</a></li>
-      <li><a data-scroll href="#options">Options</a></li>
-      <li><a data-scroll href="#methods">Methods</a></li>
+      <li><a data-scroll href="#creatures">Creatures</a></li>
+      <li><a data-scroll href="#terrarium">Terrarium</a></li>
       <li><a href="https://github.com/rileyjshaw/terra">GitHub</a></li>
     </ul>
   </nav>
@@ -41,7 +41,7 @@
     <pre><code class="language-javascript">terra.creatureFactory.register({
   type: 'firstCreature'
 });</code></pre>
-    <p>This creature is valid, but it's pretty boring. To make a more interesting creature, let's override some of the default <a data-scroll href="#options">options</a> and <a data-scroll href="#methods">methods</a>.</p>
+    <p>This creature is valid, but it's pretty boring. To make a more interesting creature, let's override some of the default <a data-scroll href="#creatures">attributes and methods</a>.</p>
     <pre><code class="language-javascript">terra.creatureFactory.register({
   type: 'secondCreature',
   color: [120, 0, 240],
@@ -53,14 +53,14 @@
     <h3>Creating the environment</h3>
     <p>To run a simulation, we'll need to create an environment. Let's make a 25x25 grid, populate 10% of the space with our lonely purple creature, and fill the rest with simple plants.</p>
     <pre><code class="language-javascript">var ex1 = new terra.Terrarium(25, 25, 'ex1');
-  ex1.populate([['secondCreature', 10], ['simplePlant', 90]]);</code></pre>
+ex1.populate([['secondCreature', 10], ['simplePlant', 90]]);</code></pre>
 
     <h3>Running a simulation</h3>
 
     <p>Terrariums have a few methods that allow you to interact with the simulation. Let's animate it and see how it does for the first 300 steps.</p>
     <pre id="ex1End"><code class="language-javascript">ex1.animate(300);</code></pre>
 
-    <p>That's all there is to it! Though it's possible to generate complex behaviours by simply overriding default values, the real fun comes when you realize that <a data-scroll href="#">the creature constructor is fully customizable</a>...</p>
+    <p>That's all there is to it! Though it's possible to generate complex behaviours by simply overriding default values, the real fun comes when you realize that <a data-scroll href="#customOptions">creatures are entirely customizable</a>.</p>
 
     <h2 id="examples">Examples</h2>
 
@@ -99,10 +99,13 @@
   this.state = Math.floor(Math.random() * 16);
 });</code></pre>
 
-    <h2 id="options">Default Options</h2>
-    <p>The following options can be passed in an object to terra.creatureFactory.register( ) as the first argument.</p>
+  <p>If you come up with a cool example, <a href="mailto:i@rileyjshaw.com">let me know</a>! I'll add it to this list and credit you.</p>
 
-    <h3>Required</h3>
+    <h2 id="creatures">Creatures</h2>
+    <p>Creatures are registered with <pre><code class="language-javascript">terra.creatureFactory.register(options, init)</code></pre></p>
+
+    <p>The following methods and attributes can be passed in an object as the first argument:</p>
+    <h3 id="creatureOptions">Required</h3>
     <ul class="defaults">
       <li>
         <h4><span class="token keyword">string</span> type</h4>
@@ -112,6 +115,20 @@
 
     <h3>Optional</h3>
     <ul class="defaults">
+      <li id="actionRadius">
+        <h4><span class="token keyword">int</span> actionRadius</h4>
+        <p>A creature's vision and movement range for each step.</p>
+        <ul>
+          <li>Default: 1</li>
+        </ul>
+      </li>
+      <li>
+        <h4><span class="token keyword">char</span> character</h4>
+        <p>ASCII character used to visually represent a creature.</p>
+        <ul>
+          <li>Default: undefined (fills cell)</li>
+        </ul>
+      </li>
       <li>
         <h4><span class="token keyword">int [3]</span> color</h4>
         <p>RGB components of a creature's display color.</p>
@@ -121,14 +138,35 @@
         </ul>
       </li>
       <li>
+        <h4><span class="token keyword">function</span> colorFn</h4>
+        <p>How a creature's color is determined at each step.</p>
+        <ul>
+          <li>Returns: <span class="mono"><span class="token keyword">string</span></span> of comma-separated RGBA components.</li>
+        </ul>
+      </li>
+      <li>
+        <h4><span class="token keyword">int</span> efficiency</h4>
+        <p>Conversion ratio of food to energy. Food energy &times; efficiency = gained energy.</p>
+        <ul>
+          <li>Default: 0.7</li>
+        </ul>
+      </li>
+      <li id="initialEnergy">
         <h4><span class="token keyword">float</span> initialEnergy</h4>
         <p>Energy level that a creature has at the start of its life.
         <ul>
-          <li>Range: (0, maxEnergy]</li>
+          <li>Range: (0, <a data-scroll href="#maxEnergy">maxEnergy</a>]</li>
           <li>Default: 50</li>
         </ul>
       </li>
       <li>
+        <h4><span class="token keyword">function</span> isDead</h4>
+        <p>Determines whether a creature should be removed at the beginning of a step.</p>
+        <ul>
+          <li>Returns: <span class="mono"><span class="token keyword">boolean</span></span></li>
+        </ul>
+      </li>
+      <li id="maxEnergy">
         <h4><span class="token keyword">float</span> maxEnergy</h4>
         <p>Maximum energy that a creature can have; excess energy is discarded.</p>
         <ul>
@@ -137,50 +175,138 @@
         </ul>
       </li>
       <li>
-        <h4><span class="token keyword">int</span> metabolism</h4>
-        <p></p>
-      </li>
-      <li>
-        <h4><span class="token keyword">int</span> size</h4>
-        <p></p>
-      </li>
-      <li>
-        <h4><span class="token keyword">int</span> actionRadius</h4>
-        <p>Defines a creature's vision and movement range for each step.</p>
+        <h4><span class="token keyword">function</span> move</h4>
+        <p>How a creature moves.</p>
         <ul>
-          <li>Default: 1</li>
-          <li>Minimum: 1</li>
+          <li>Parameters: <span class="mono"><span class="token keyword">{coords, creature} []</span> neighbors</span></li>
+          <li>Default: Look for edible creatures; if none are found, look for open spaces to move to; if none are found, wait.</li>
+          <li>Returns: <span class="mono">{x, y, creature, successFn} || false</span></li>
         </ul>
       </li>
       <li>
-        <h4><span class="token keyword">int</span> sustainability: </h4>
-        <p>Amount of visible food sources required for a creature to eat. Default: 2.</p>
+        <h4><span class="token keyword">float</span> moveLv</h4>
+        <p></p>
+        <ul>
+          <p>Percentage of a creature's max energy below which it will stop moving (used in the default <a data-scroll href="#queue">queue</a> method).</p>
+          <li>Range: [0, 1]</li>
+        </ul>
+      </li>
+      <li id="queue">
+        <h4><span class="token keyword">function</span> queue</h4>
+        <p>Main entry point for behavior; called for each creature on each iteration.</p>
+        <ul>
+          <li>Parameters: <span class="mono"><span class="token keyword">{coords, creature} []</span> neighbors</span></li>
+          <li>Default: Reproduce if energy is sufficient, otherwise move if energy is sufficient, otherwise wait.</li>
+          <li>Returns: <span class="mono">{x, y, creature} || false</span></li>
+        </ul>
       </li>
       <li>
-        <h4><span class="token keyword">float</span> reproduceLv: 0.7</h4>
-        <p></p>
+        <h4><span class="token keyword">function</span> reproduce</h4>
+        <p>How a creature reproduces.</p>
+        <ul>
+          <li>Parameters: <span class="mono"><span class="token keyword">{coords, creature} []</span> neighbors</span></li>
+          <li>Default: Look for neighboring open space; if any exists, randomly place a new creature and lose energy equal to the child's <a data-scroll href="#initialEnergy">initialEnergy</a>.</li>
+          <li>Returns: <span class="mono">{x, y, creature, successFn, failureFn} || false</span></li>
+        </ul>
       </li>
       <li>
-        <h4><span class="token keyword">float</span> moveLv: 0.2</h4>
-        <p></p>
+        <h4><span class="token keyword">float</span> reproduceLv</h4>
+        <p>Percentage of a creature's max energy above which it will reproduce (used in the default <a data-scroll href="#queue">queue</a> method).</p>
+        <ul>
+          <li>Default: 0.7</li>
+          <li>Range: [0, 1]</li>
+        </ul>
       </li>
       <li>
-        <h4><span class="token keyword">char</span> character</h4>
-        <p></p>
+        <h4><span class="token keyword">int</span> size</h4>
+        <p>A creature's size; by default, creatures can only eat creatures smaller than them.</p>
+        <ul>
+          <li>Default: 50</li>
+        </ul>
+      </li>
+      <li>
+        <h4><span class="token keyword">int</span> sustainability</h4>
+        <p>Number of visible food sources needed before a creature will eat.</p>
+        <ul>
+          <li>Default: 2</li>
+          <li>Range: (0, 16 &times; <a data-scroll href="#actionRadius">actionRadius</a> - 8]</li>
+        </ul>
+      </li>
+      <li>
+        <h4><span class="token keyword">function</span> wait</h4>
+        <p>What happens when a creature waits.</p>
+        <ul>
+          <li>Default: Creature loses 5 energy.</li>
+        </ul>
+      </li>
+      <li id="customOptions">
+        <h4><span class="token keyword">*</span> *</h4>
+        <p>The best part about creatures is that you can add <em>whatever you want</em> to them! In addition to overriding any of the above properties, creatures will accept any methods and properties you throw at 'em.</p>
       </li>
     </ul>
 
-    <h2 id="methods">Methods</h2>
+    <p>The second argument to terra.creatureFactory.register is the init function. This function is run within a creature's constructor and allows you to set different attributes for individual creatures. For example, in the <a data-scroll href="#cyclic">Cyclic Cellular Automaton</a> example above we see the following init function:</p>
+    <pre><code class="language-javascript">function () {
+  this.state = Math.floor(Math.random() * 16);
+});</code></pre>
+    <p>Whenever a new creature is created of type 'cyclic', it will be randomly assigned a state of 0 to 15.</p>
+
+    <h2 id="terrarium">Terrarium</h2>
+    <p>Terrariums are where the action happens. They're initialized with the following constructor:</p>
+    <pre><code class="language-javascript">var t = new Terrarium(width, height, id, cellSize, insertAfter);</code></pre>
+    <h3>Required</h3>
     <ul class="defaults">
-      <li>queue</li>
-      <li>reproduce</li>
-      <li>move</li>
-      <li>wait</li>
-      <li>isDead</li>
-      <li>boundEnergy</li>
-      <li>colorFn</li>
+      <li>
+        <h4><span class="token keyword">int</span> width</h4>
+        <p>Number of cells in the x-direction.</p>
+      </li>
+      <li>
+        <h4><span class="token keyword">int</span> height</h4>
+        <p>Number of cells in the y-direction.</p>
+      </li>
+    </ul>
+    <h3>Optional</h3>
+    <ul class="defaults">
+      <li>
+        <h4><span class="token keyword">string</span> id</h4>
+        <p>id assigned to the generated canvas.</p>
+      </li>
+      <li>
+        <h4><span class="token keyword">int</span> cellSize</h4>
+        <p>Pixel width of each cell.</p>
+        <ul>
+          <li>Default: 10</li>
+        </ul>
+      </li>
+      <li>
+        <h4><span class="token keyword">string</span> insertAfter</h4>
+        <p>id of the element to insert the canvas after.</p>
+        <ul>
+          <li>Default: canvas is appended to <code class="language-markup">document.body</code></li>
+        </ul>
+      </li>
     </ul>
 
+    <p>Once initialized, terrariums have a few exposed methods. Using our terrarium <code class="language-javascript">t</code> that we just created:</p>
+    <pre><code class="language-javascript">t.populate(creatures);
+//populates the terrarium with a set distribution of creatures.
+//&lt;creatures&gt; is an array of arrays of the form [string 'creatureName', int fillPercent]
+
+t.grid = t.step(steps);
+//t.step returns the next step of the simulation, or the grid after &lt;steps&gt; steps if specified.
+//here, we're setting the terrarium's grid to the returned grid.
+
+t.draw();
+//updates the canvas to reflect the current grid
+
+t.animate(steps, fn);
+//starts animating the simulation. The simulation will stop after &lt;steps&gt; steps
+//if specified, and call &lt;fn&gt; as a callback once the animation finishes.
+
+t.stop();
+//stops a currently running animation</code></pre>
+
+    <p>Still want more? Check out the source on <a href="https://github.com/rileyjshaw/terra">GitHub</a>!</p>
   </div>
 
   <footer>Created with ❤ by <a href="http://rileyjshaw.com">rileyjshaw</a>. Inspired by <a href="http://eloquentjavascript.net/">Marijn Haverbeke</a> and <a href="https://www.wolframscience.com/">Stephen Wolfram</a>.</footer>
