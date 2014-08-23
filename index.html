@@ -65,7 +65,7 @@ ex1.populate([['secondCreature', 10], ['simplePlant', 90]]);</code></pre>
     <h2 id="examples">Examples</h2>
 
     <h3 id="gol">Conway's Game of Life <a class="question" target="_blank" href="http://en.wikipedia.org/wiki/Conway's_Game_of_Life">?</a></h3>
-    <pre><code class="language-javascript">var gameOfLife = new Terrarium(25, 25);
+    <pre><code class="language-javascript">var gameOfLife = new terra.Terrarium(25, 25);
 
 terra.creatureFactory.register({
   type: 'GoL',
@@ -87,7 +87,7 @@ gameOfLife.populate([['GoL', 100]]);
 gameOfLife.animate();</code></pre>
 
     <h3 id="cyclic">Cyclic Cellular Automaton <a class="question" target="_blank" href="http://en.wikipedia.org/wiki/Cyclic_cellular_automaton">?</a></h3>
-    <pre><code class="language-javascript">var cyclic = new Terrarium(25, 25);
+    <pre><code class="language-javascript">var cyclic = new terra.Terrarium(25, 25);
 
 terra.creatureFactory.register({
   type: 'cyclic',
@@ -263,7 +263,7 @@ cyclic.animate();</code></pre>
 
     <h2 id="terrarium">Terrarium</h2>
     <p>Terrariums are where the action happens. They're initialized with the following constructor:</p>
-    <pre><code class="language-javascript">var t = new Terrarium(width, height, id, cellSize, insertAfter);</code></pre>
+    <pre><code class="language-javascript">var t = new terra.Terrarium(width, height, id, cellSize, insertAfter);</code></pre>
     <h3>Required</h3>
     <ul class="defaults">
       <li>
