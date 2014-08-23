@@ -1,6 +1,6 @@
 terra
 =====
 
-JS framework for cellular automata and simple biological simulations.
+JS framework for cellular automata and simple biological simulations. Documentation and examples live [here](http://rileyjshaw.com/terra/).
 
-Used to live [here](https://github.com/rileyjshaw/hs-goals/tree/master/goal-008) and [here](https://github.com/rileyjshaw/hs-goals/tree/master/goal-009).
+MIT, remixing strongly encouraged.
