@@ -65,7 +65,9 @@ ex1.populate([['secondCreature', 10], ['simplePlant', 90]]);</code></pre>
     <h2 id="examples">Examples</h2>
 
     <h3 id="gol">Conway's Game of Life <a class="question" target="_blank" href="http://en.wikipedia.org/wiki/Conway's_Game_of_Life">?</a></h3>
-    <pre><code class="language-javascript">terra.creatureFactory.register({
+    <pre><code class="language-javascript">var gameOfLife = new Terrarium(25, 25);
+
+terra.creatureFactory.register({
   type: 'GoL',
   colorFn: function () { return this.alive ? this.color + ',1' : '0,0,0,0'; },
   wait: function () {},
@@ -79,10 +81,15 @@ ex1.populate([['secondCreature', 10], ['simplePlant', 90]]);</code></pre>
   }
 }, function () {
   this.alive = Math.random() &lt; 0.5;
-});</code></pre>
+});
+
+gameOfLife.populate([['GoL', 100]]);
+gameOfLife.animate();</code></pre>
 
     <h3 id="cyclic">Cyclic Cellular Automaton <a class="question" target="_blank" href="http://en.wikipedia.org/wiki/Cyclic_cellular_automaton">?</a></h3>
-    <pre><code class="language-javascript">terra.creatureFactory.register({
+    <pre><code class="language-javascript">var cyclic = new Terrarium(25, 25);
+
+terra.creatureFactory.register({
   type: 'cyclic',
   colors: ['255,0,0,1', '255,96,0,1', '255,191,0,1', '223,255,0,1', '128,255,0,1', '32,255,0,1', '0,255,64,1', '0,255,159,1', '0,255,255,1', '0,159,255,1', '0,64,255,1', '32,0,255,1', '127,0,255,1', '223,0,255,1', '255,0,191,1', '255,0,96,1'],
   colorFn: function () { return this.colors[this.state];},
@@ -97,7 +104,10 @@ ex1.populate([['secondCreature', 10], ['simplePlant', 90]]);</code></pre>
   }
 }, function () {
   this.state = Math.floor(Math.random() * 16);
-});</code></pre>
+});
+
+cyclic.populate([['cyclic', 100]]);
+cyclic.animate();</code></pre>
 
   <p>If you come up with a cool example, <a href="mailto:i@rileyjshaw.com">let me know</a>! I'll add it to this list and credit you.</p>
 
