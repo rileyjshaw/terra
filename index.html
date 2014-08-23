@@ -35,6 +35,8 @@
     <p>Getting started is as easy as including the script!</p>
     <pre><code class="language-markup">&lt;script src="path/to/terra.min.js"&gt;&lt;/script&gt;</code></pre>
     <p>terra can also be used as a module with most popular module systems. <a class="question" target="_blank" href="https://github.com/umdjs/umd">?</a></p>
+    <pre><code class="language-javascript">
+    </code></pre>
 
     <h3>Creating creatures</h3>
     <p>Let's create a simple creature using the creatureFactory. Each creature requires a type.</p>
@@ -119,7 +121,7 @@ cyclic.animate();</code></pre>
     <ul class="defaults">
       <li>
         <h4><span class="token keyword">string</span> type</h4>
-        <p>Creature type, to be used later in <a data-scroll href="#populate" class="token function">populate( )</a>.</p>
+        <p>Creature type, to be used later in <a data-scroll href="#terrariumMethods" class="token function">populate( )</a>.</p>
       </li>
     </ul>
 
@@ -297,7 +299,7 @@ cyclic.animate();</code></pre>
       </li>
     </ul>
 
-    <p>Once initialized, terrariums have a few exposed methods. Using our terrarium <code class="language-javascript">t</code> that we just created:</p>
+    <p id="terrariumMethods">Once initialized, terrariums have a few exposed methods. Using our terrarium <code class="language-javascript">t</code> that we just created:</p>
     <pre><code class="language-javascript">t.populate(creatures);
 //populates the terrarium with a set distribution of creatures.
 //&lt;creatures&gt; is an array of arrays of the form [string 'creatureName', int fillPercent]
