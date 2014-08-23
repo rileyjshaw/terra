@@ -17,7 +17,8 @@ var paths = {
     extraScripts: [
       './bower_components/smooth-scroll.js/dist/js/bind-polyfill.min.js',
       './bower_components/smooth-scroll.js/dist/js/smooth-scroll.min.js',
-      './demo/scripts/prism.js'
+      './demo/scripts/prism.js',
+      './demo/scripts/analytics.js'
     ],
     stylesheets: {
       css: './demo/stylesheets/**/*.css',
