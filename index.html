@@ -111,7 +111,7 @@ terra.creatureFactory.register({
 cyclic.populate([['cyclic', 100]]);
 cyclic.animate();</code></pre>
 
-    <h3 id="wimpsAndBullies">Wimps and Bullies</h3>
+    <h3 id="brutesAndBullies">Brutes and Bullies</h3>
     <pre><code class="language-javascript">// the demo running at the top of this page
 var paTerrarium = new terra.Terrarium(25, 25);
 
@@ -130,7 +130,7 @@ terra.creatureFactory.register({
 });
 
 creatureFactory.register({
-  type: 'wimp',
+  type: 'brute',
   color: [0, 255, 255],
   maxEnergy: 50,
   initialEnergy: 10,
@@ -140,13 +140,12 @@ creatureFactory.register({
 creatureFactory.register({
   type: 'bully',
   color: [241, 196, 15],
-  maxEnergy: 50,
-  initialEnergy: 15,
+  initialEnergy: 20,
   reproduceLv: 0.6,
   sustainability: 3
 });
 
-paTerrarium.populate([['plant', 50], ['wimp', 5], ['bully', 5]]);
+paTerrarium.populate([['plant', 50], ['brute', 5], ['bully', 5]]);
 paTerrarium.animate();</code></pre>
 
   <p>If you come up with a cool example, <a href="mailto:i@rileyjshaw.com">let me know</a>! I'll add it to this list and credit you.</p>
