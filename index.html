@@ -89,7 +89,7 @@ gameOfLife.populate([['GoL', 100]]);
 gameOfLife.animate();</code></pre>
 
     <h3 id="cyclic">Cyclic Cellular Automaton <a class="question" target="_blank" href="http://en.wikipedia.org/wiki/Cyclic_cellular_automaton">?</a></h3>
-    <pre><code class="language-javascript">var cyclic = new terra.Terrarium(25, 25);
+    <pre><code class="language-javascript">var cyclic = new terra.Terrarium(100, 100);
 
 terra.creatureFactory.register({
   type: 'cyclic',
@@ -110,6 +110,46 @@ terra.creatureFactory.register({
 
 cyclic.populate([['cyclic', 100]]);
 cyclic.animate();</code></pre>
+
+    <h3 id="wimpsAndBullies">Wimps and Bullies</h3>
+    <pre><code class="language-javascript">// the demo running at the top of this page
+var paTerrarium = new terra.Terrarium(25, 25);
+
+terra.creatureFactory.register({
+  type: 'plant',
+  color: [0, 120, 0],
+  size: 10,
+  initialEnergy: 5,
+  maxEnergy: 20,
+  wait: function() {
+    // photosynthesis :)
+    this.energy += 1;
+  },
+  move: false,
+  reproduceLv: 0.65
+});
+
+terra.creatureFactory.register({
+  type: 'wimp',
+  color: [0, 255, 255],
+  size: 20,
+  maxEnergy: 50,
+  moveLv: 0,
+  initialEnergy: 10
+});
+
+terra.creatureFactory.register({
+  type: 'bully',
+  color: [241, 196, 15],
+  size: 30,
+  maxEnergy: 50,
+  initialEnergy: 10,
+  moveLv: 0,
+  sustainability: 3
+});
+
+paTerrarium.populate([['plant', 50], ['wimp', 5], ['bully', 5]]);
+paTerrarium.animate();</code></pre>
 
   <p>If you come up with a cool example, <a href="mailto:i@rileyjshaw.com">let me know</a>! I'll add it to this list and credit you.</p>
 
