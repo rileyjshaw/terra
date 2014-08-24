@@ -34,9 +34,21 @@
     <h3>Including terra</h3>
     <p>Getting started is as easy as including the script!</p>
     <pre><code class="language-markup">&lt;script src="path/to/terra.min.js"&gt;&lt;/script&gt;</code></pre>
-    <p>terra can also be used as a module with most popular module systems. <a class="question" target="_blank" href="https://github.com/umdjs/umd">?</a></p>
-    <pre><code class="language-javascript">
-    </code></pre>
+    <p>terra can also be used as a module with most popular module systems: <a class="question" target="_blank" href="https://github.com/umdjs/umd">?</a></p>
+    <pre><code class="language-javascript">// CommonJS
+var terra = require('./terra.min.js');
+// ...
+
+// AMD
+define(['./terra.min.js'] , function (terra) {
+    return function () { /*...*/ };
+});
+
+// ...and if you're not using a module system, it'll be in
+window.terra;</code></pre>
+
+    <p>If you manage dependencies with <a href="http://bower.io/">Bower</a>, you're in luck!</p>
+    <pre><code class="language-bash">bower install terra</code></pre>
 
     <h3>Creating creatures</h3>
     <p>Let's create a simple creature using the creatureFactory. Each creature requires a type.</p>
