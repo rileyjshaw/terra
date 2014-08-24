@@ -129,22 +129,20 @@ terra.creatureFactory.register({
   reproduceLv: 0.65
 });
 
-terra.creatureFactory.register({
+creatureFactory.register({
   type: 'wimp',
   color: [0, 255, 255],
-  size: 20,
-  maxEnergy: 50,
-  moveLv: 0,
-  initialEnergy: 10
-});
-
-terra.creatureFactory.register({
-  type: 'bully',
-  color: [241, 196, 15],
-  size: 30,
   maxEnergy: 50,
   initialEnergy: 10,
-  moveLv: 0,
+  size: 20
+});
+
+creatureFactory.register({
+  type: 'bully',
+  color: [241, 196, 15],
+  maxEnergy: 50,
+  initialEnergy: 15,
+  reproduceLv: 0.6,
   sustainability: 3
 });
 
@@ -240,6 +238,7 @@ paTerrarium.animate();</code></pre>
         <p></p>
         <ul>
           <p>Percentage of a creature's max energy below which it will stop moving (used in the default <a data-scroll href="#queue">queue</a> method).</p>
+          <li>Default: 0</li>
           <li>Range: [0, 1]</li>
         </ul>
       </li>
