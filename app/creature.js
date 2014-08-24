@@ -14,7 +14,7 @@ var creatureFactory = (function () {
   baseCreature.prototype.sustainability = 2;
   // used as percentages of maxEnergy
   baseCreature.prototype.reproduceLv = 0.70;
-  baseCreature.prototype.moveLv = 0.20;
+  baseCreature.prototype.moveLv = 0;
 
   baseCreature.prototype.boundEnergy = function() {
     if (this.energy > this.maxEnergy)
