@@ -14,6 +14,7 @@ var dom = require('./dom.js');
 function Terrarium(width, height, id, cellSize, insertAfter) {
   this.width = width;
   this.height = height;
+  cellSize = cellSize || 10;
   this.cellSize = cellSize || 10;
   this.grid = [];
   this.canvas = dom.createCanvasElement(width * cellSize, height * cellSize, id, insertAfter);
