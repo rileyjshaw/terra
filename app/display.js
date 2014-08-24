@@ -22,4 +22,12 @@ module.exports = function (canvas, grid, cellSize) {
       }
     });
   });
+
+  var canvasClone = document.createElement('canvas');
+  var context = canvasClone.getContext('2d');
+  //set dimensions
+  canvasClone.width = canvas.width;
+  canvasClone.height = canvas.height;
+  context.drawImage(canvas, 0, 0);
+  return canvasClone;
 };

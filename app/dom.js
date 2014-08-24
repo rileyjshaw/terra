@@ -1,6 +1,6 @@
 // Creates an HD canvas element on page and
 // returns a reference to the element
-var createCanvasElement = function (width, height, id, insertAfter) {
+var createCanvasElement = function (width, height, id, insertAfter, supress) {
   // Creates a scaled-up canvas based on the device's
   // resolution, then displays it properly using styles
   function createHDCanvas (ratio) {
@@ -29,9 +29,11 @@ var createCanvasElement = function (width, height, id, insertAfter) {
   }
 
   var canvas = createHDCanvas();
+  if(!supress){
+    if (insertAfter) insertAfter.parentNode.insertBefore(canvas, insertAfter.nextSibling);
+    else document.body.appendChild(canvas);
+  }
 
-  if (insertAfter) insertAfter.parentNode.insertBefore(canvas, insertAfter.nextSibling);
-  else document.body.appendChild(canvas);
 
   return canvas;
 };

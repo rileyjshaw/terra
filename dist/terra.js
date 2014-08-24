@@ -205,12 +205,20 @@ module.exports = function (canvas, grid, cellSize) {
       }
     });
   });
+
+  var canvasClone = document.createElement('canvas');
+  var context = canvasClone.getContext('2d');
+  //set dimensions
+  canvasClone.width = canvas.width;
+  canvasClone.height = canvas.height;
+  context.drawImage(canvas, 0, 0);
+  return canvasClone;
 };
 
 },{"./util.js":6}],4:[function(require,module,exports){
 // Creates an HD canvas element on page and
 // returns a reference to the element
-var createCanvasElement = function (width, height, id, insertAfter) {
+var createCanvasElement = function (width, height, id, insertAfter, supress) {
   // Creates a scaled-up canvas based on the device's
   // resolution, then displays it properly using styles
   function createHDCanvas (ratio) {
@@ -239,9 +247,11 @@ var createCanvasElement = function (width, height, id, insertAfter) {
   }
 
   var canvas = createHDCanvas();
+  if(!supress){
+    if (insertAfter) insertAfter.parentNode.insertBefore(canvas, insertAfter.nextSibling);
+    else document.body.appendChild(canvas);
+  }
 
-  if (insertAfter) insertAfter.parentNode.insertBefore(canvas, insertAfter.nextSibling);
-  else document.body.appendChild(canvas);
 
   return canvas;
 };
@@ -263,14 +273,20 @@ var dom = require('./dom.js');
  * @param {string} id             id assigned to the generated canvas
  * @param {int} cellSize          pixel width of each cell (default 10)
  * @param {string} insertAfter    id of the element to insert the canvas after
+ * @param {string} supress        boolean specifying whether or not to supress
+                                  rendered output. Useful when using the render
+                                  method to produce frames as opposed to the
+                                  animate method
  */
-function Terrarium(width, height, id, cellSize, insertAfter) {
+function Terrarium(width, height, id, cellSize, insertAfter, supress) {
+  cellSize = cellSize || 10;
   this.width = width;
   this.height = height;
-  this.cellSize = cellSize || 10;
+  this.cellSize = cellSize;
   this.grid = [];
-  this.canvas = dom.createCanvasElement(width * cellSize, height * cellSize, id, insertAfter);
+  this.canvas = dom.createCanvasElement(width * cellSize, height * cellSize, id, insertAfter, supress);
   this.nextFrame = false;
+  this.supress = false;
 }
 
 /**
@@ -422,7 +438,7 @@ Terrarium.prototype.step = function (steps) {
  * Updates the canvas to reflect the current grid
  */
 Terrarium.prototype.draw = function () {
-  display(this.canvas, this.grid, this.cellSize);
+  return display(this.canvas, this.grid, this.cellSize);
 };
 
 /**
@@ -447,6 +463,52 @@ Terrarium.prototype.animate = function (steps, fn) {
     self.nextFrame = requestAnimationFrame(tick);
   }
 };
+
+/**
+ * Starts rendering the simulation
+ * @param  {int}   steps   the simulation will stop after <steps> steps if specified
+ * @param  {Function} stepFn (optional) called as a callback at the end of each animation. The argument passed to stepFn is an object with two properties
+        object.grid = the grid drawn
+        object.canvas = the canvas rendered
+ * @param  {Function} endFn   called as a callback once the animation finishes. The argument passed is an array of all of the rendered objects (see stepFn)
+ */
+Terrarium.prototype.render = function (steps, stepFn, endFn) {
+  stepFn = typeof stepFn === "function" ? stepFn : undefined;
+  endFn = typeof endFn === "function" ? endFn : undefined;
+  if(stepFn && !endFn){
+      endFn = stepFn;
+      stepFn = undefined;
+  }
+  var frames = [];
+  function tick () {
+    self.grid = self.step();
+    var canvas = self.draw();
+    var grid = self.grid;
+    var item = {
+        grid : self.grid,
+        canvas : self.draw()
+    };
+    if(typeof stepFn === "function"){
+        stepFn(item);
+    }
+    frames.push(item);
+    if (i++ !== steps) self.nextFrame = requestAnimationFrame(tick);
+    else {
+      self.nextFrame = false;
+      if(typeof endFn === "function"){
+          endFn(frames);
+      }
+    }
+  }
+  if (!this.nextFrame) {
+    var i = 0;
+    var self = this;
+    self.nextFrame = requestAnimationFrame(tick);
+  }
+  return frames;
+};
+
+
 
 /**
  * Stops a currently running animation
