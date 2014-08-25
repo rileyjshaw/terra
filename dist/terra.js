@@ -185,7 +185,6 @@ var _ = require('./util.js');
 
 module.exports = function (canvas, grid, cellSize) {
   var ctx = canvas.getContext('2d');
-  ctx.font = 'bold ' + cellSize + 'px Arial';
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   _.each(grid, function (column, x) {
@@ -215,16 +214,17 @@ var createCanvasElement = function (width, height, id, insertAfter) {
   // resolution, then displays it properly using styles
   function createHDCanvas (ratio) {
     var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
 
     // Creates a dummy canvas to test device's pixel ratio
     ratio = (function () {
-      var context = document.createElement('canvas').getContext('2d');
+      var ctx = document.createElement('canvas').getContext('2d');
       var dpr = window.devicePixelRatio || 1;
-      var bsr = context.webkitBackingStorePixelRatio ||
-                context.mozBackingStorePixelRatio ||
-                context.msBackingStorePixelRatio ||
-                context.oBackingStorePixelRatio ||
-                context.backingStorePixelRatio || 1;
+      var bsr = ctx.webkitBackingStorePixelRatio ||
+                ctx.mozBackingStorePixelRatio ||
+                ctx.msBackingStorePixelRatio ||
+                ctx.oBackingStorePixelRatio ||
+                ctx.backingStorePixelRatio || 1;
       return dpr / bsr;
     })();
 
@@ -232,7 +232,9 @@ var createCanvasElement = function (width, height, id, insertAfter) {
     canvas.height = height * ratio;
     canvas.style.width = width + 'px';
     canvas.style.height = height + 'px';
-    canvas.getContext('2d').setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.font = 'bold ' + cellSize + 'px Arial';
+
     if (id) canvas.id = id;
 
     return canvas;
