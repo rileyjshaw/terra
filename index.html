@@ -67,7 +67,7 @@ window.terra;</code></pre>
     <h3>Creating the environment</h3>
     <p>To run a simulation, we'll need to create an environment. Let's make a 25x25 grid, populate 10% of the space with our lonely purple creature, and fill the rest with simple plants.</p>
     <pre><code class="language-javascript">var ex1 = new terra.Terrarium(25, 25, 'ex1');
-ex1.populate([['secondCreature', 10], ['simplePlant', 90]]);</code></pre>
+ex1.grid = ex1.makeGridWithDistribution([['secondCreature', 10], ['simplePlant', 90]]);</code></pre>
 
     <h3>Running a simulation</h3>
 
@@ -97,7 +97,7 @@ terra.creatureFactory.register({
   this.alive = Math.random() &lt; 0.5;
 });
 
-gameOfLife.populate([['GoL', 100]]);
+gameOfLife.grid = gameOfLife.makeGrid('GoL');
 gameOfLife.animate();</code></pre>
 
     <h3 id="cyclic">Cyclic Cellular Automaton <a class="question" target="_blank" href="http://en.wikipedia.org/wiki/Cyclic_cellular_automaton">?</a></h3>
@@ -120,12 +120,12 @@ terra.creatureFactory.register({
   this.state = Math.floor(Math.random() * 16);
 });
 
-cyclic.populate([['cyclic', 100]]);
+cyclic.grid = cyclic.makeGrid('cyclic');
 cyclic.animate();</code></pre>
 
     <h3 id="brutesAndBullies">Brutes and Bullies</h3>
     <pre><code class="language-javascript">// the demo running at the top of this page
-var paTerrarium = new terra.Terrarium(25, 25);
+var bbTerrarium = new terra.Terrarium(25, 25);
 
 terra.creatureFactory.register({
   type: 'plant',
@@ -157,8 +157,8 @@ creatureFactory.register({
   sustainability: 3
 });
 
-paTerrarium.populate([['plant', 50], ['brute', 5], ['bully', 5]]);
-paTerrarium.animate();</code></pre>
+bbTerrarium.grid = bbTerrarium.makeGridWithDistribution([['plant', 50], ['brute', 5], ['bully', 5]]);
+bbTerrarium.animate();</code></pre>
 
   <p>If you come up with a cool example, <a href="mailto:i@rileyjshaw.com">let me know</a>! I'll add it to this list and credit you.</p>
 
@@ -170,7 +170,7 @@ paTerrarium.animate();</code></pre>
     <ul class="defaults">
       <li>
         <h4><span class="token keyword">string</span> type</h4>
-        <p>Creature type, to be used later in <a data-scroll href="#terrariumMethods" class="token function">populate( )</a>.</p>
+        <p>Creature type, to be used later in <a data-scroll href="#terrariumMethods" class="token function">makeGrid( )</a> or <a data-scroll href="#terrariumMethods" class="token function">makeGridWithDistribution( )</a>.</p>
       </li>
     </ul>
 
@@ -315,7 +315,9 @@ paTerrarium.animate();</code></pre>
 
     <h2 id="terrarium">Terrarium</h2>
     <p>Terrariums are where the action happens. They're initialized with the following constructor:</p>
-    <pre><code class="language-javascript">var t = new terra.Terrarium(width, height, id, cellSize, insertAfter);</code></pre>
+    <pre><code class="language-javascript">//new terra.Terrarium(width, height, id, cellSize, insertAfter);
+//example: create a 4x4 terrarium called #myTerrarium after element #bugStory
+var t = new terra.Terrarium(4, 4, 'myTerrarium', 15, document.getElementById('bugStory');</code></pre>
     <h3>Required</h3>
     <ul class="defaults">
       <li>
@@ -350,23 +352,61 @@ paTerrarium.animate();</code></pre>
     </ul>
 
     <p id="terrariumMethods">Once initialized, terrariums have a few exposed methods. Using our terrarium <code class="language-javascript">t</code> that we just created:</p>
-    <pre><code class="language-javascript">t.populate(creatures);
-//populates the terrarium with a set distribution of creatures.
-//&lt;creatures&gt; is an array of arrays of the form [string 'creatureName', int fillPercent]
+    <pre><code class="language-javascript">//initial setup
+var a = 'a', b = 'b';
+terra.creatureFactory.register({type: a});
+terra.creatureFactory.register({type: b});
 
-t.grid = t.step(steps);
-//t.step returns the next step of the simulation, or the grid after &lt;steps&gt; steps if specified.
-//here, we're setting the terrarium's grid to the returned grid.
+/* makeGrid(content)
+ *
+ * Returns a grid populated using a function, 2-d array, or uniform type */
+// example: fill the terrarium with the 'b' creature type
+t.grid = t.makeGrid(b);
 
+// example: fill the terrarium with a checkerboard pattern
+t.grid = t.makeGrid(function (x, y) {
+  return (x + y) % 2 ? a : b;
+});
+
+// example: fill the terrarium's left half with 'a', right half with 'b'
+t.grid = t.makeGrid([
+  [a, a, b, b],
+  [a, a, b, b],
+  [a, a, b, b],
+  [a, a, b, b]
+]);
+
+/* makeGridWithDistribution(distribution)
+ *
+ * Returns a grid populated randomly with a set creature distribution, where distribution
+ *   is an array of arrays of the form [string 'creatureName', float fillPercent] */
+// example: fill the terrarium randomly with approximately half 'a' and half 'b'
+t.grid = t.makeGridWithDistribution([[a, 50], [b, 50]]);
+
+/* step(steps)
+ *
+ * Returns the next step of the simulation, or the grid after &lt;steps&gt; steps if specified */
+// example: advance the terrarium 10 steps in the future
+t.grid = t.step(10);
+
+/* draw()
+ *
+ * Updates the terrarium's canvas to reflect the current grid */
+// example: display all the work we've done above
 t.draw();
-//updates the canvas to reflect the current grid
 
-t.animate(steps, fn);
-//starts animating the simulation. The simulation will stop after &lt;steps&gt; steps
-//if specified, and call &lt;fn&gt; as a callback once the animation finishes.
+/* animate(steps, fn)
+ *
+ * Starts animating the simulation. The simulation will stop after &lt;steps&gt; steps
+ *   if specified, and call &lt;fn&gt; as a callback once the animation finishes. */
+// example: animate the terrarium
+t.animate();
 
-t.stop();
-//stops a currently running animation</code></pre>
+/* stop()
+ *
+ * stops a currently running simulation */
+// example: stop the animation that we just started
+t.stop();</code></pre>
 
     <p>Still want more? Check out the source on <a href="https://github.com/rileyjshaw/terra">GitHub</a>!</p>
   </div>
