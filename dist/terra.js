@@ -265,9 +265,10 @@ var dom = require('./dom.js');
  * @param {string} insertAfter    id of the element to insert the canvas after
  */
 function Terrarium(width, height, id, cellSize, insertAfter) {
+  cellSize = cellSize || 10;
   this.width = width;
   this.height = height;
-  this.cellSize = cellSize || 10;
+  this.cellSize = cellSize;
   this.grid = [];
   this.canvas = dom.createCanvasElement(width * cellSize, height * cellSize, id, insertAfter);
   this.nextFrame = false;
