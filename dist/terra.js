@@ -470,7 +470,7 @@ module.exports = Terrarium;
 
 },{"./creature.js":2,"./display.js":3,"./dom.js":4,"./util":6}],6:[function(require,module,exports){
 // Seed Math.random() with seedrandom
-require('../bower_components/seedrandom/seedrandom.js')('terra', {global: true});
+require('../bower_components/seedrandom/seedrandom.js')('terra :)', {global: true});
 
 // an extended custom build of lodash, generated with:
 // lodash exports=commonjs include=assign,clone,filter,each,map,random,reduce,some

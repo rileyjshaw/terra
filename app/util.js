@@ -1,5 +1,5 @@
 // Seed Math.random() with seedrandom
-require('../bower_components/seedrandom/seedrandom.js')('terra', {global: true});
+require('../bower_components/seedrandom/seedrandom.js')('terra :)', {global: true});
 
 // an extended custom build of lodash, generated with:
 // lodash exports=commonjs include=assign,clone,filter,each,map,random,reduce,some
