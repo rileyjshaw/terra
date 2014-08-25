@@ -13,11 +13,11 @@ var dom = require('./dom.js');
  */
 function Terrarium(width, height, id, cellSize, insertAfter) {
   cellSize = cellSize || 10;
+  this.cellSize = cellSize;
   this.width = width;
   this.height = height;
-  this.cellSize = cellSize;
   this.grid = [];
-  this.canvas = dom.createCanvasElement(width * cellSize, height * cellSize, id, insertAfter);
+  this.canvas = dom.createCanvasElement(width, height, cellSize, id, insertAfter);
   this.nextFrame = false;
 }
 

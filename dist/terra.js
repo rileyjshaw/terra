@@ -209,7 +209,10 @@ module.exports = function (canvas, grid, cellSize) {
 },{"./util.js":6}],4:[function(require,module,exports){
 // Creates an HD canvas element on page and
 // returns a reference to the element
-var createCanvasElement = function (width, height, id, insertAfter) {
+var createCanvasElement = function (width, height, cellSize, id, insertAfter) {
+  width *= cellSize;
+  height *= cellSize;
+
   // Creates a scaled-up canvas based on the device's
   // resolution, then displays it properly using styles
   function createHDCanvas (ratio) {
@@ -268,11 +271,11 @@ var dom = require('./dom.js');
  */
 function Terrarium(width, height, id, cellSize, insertAfter) {
   cellSize = cellSize || 10;
+  this.cellSize = cellSize;
   this.width = width;
   this.height = height;
-  this.cellSize = cellSize;
   this.grid = [];
-  this.canvas = dom.createCanvasElement(width * cellSize, height * cellSize, id, insertAfter);
+  this.canvas = dom.createCanvasElement(width, height, cellSize, id, insertAfter);
   this.nextFrame = false;
 }
 

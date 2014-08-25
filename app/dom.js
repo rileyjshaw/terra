@@ -1,6 +1,9 @@
 // Creates an HD canvas element on page and
 // returns a reference to the element
-var createCanvasElement = function (width, height, id, insertAfter) {
+var createCanvasElement = function (width, height, cellSize, id, insertAfter) {
+  width *= cellSize;
+  height *= cellSize;
+
   // Creates a scaled-up canvas based on the device's
   // resolution, then displays it properly using styles
   function createHDCanvas (ratio) {
