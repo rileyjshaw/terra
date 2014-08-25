@@ -31,6 +31,16 @@ _.getNeighborCoords = function (x0, y0, xMax, yMax, radius) {
   return coords;
 };
 
+_.pickRandomWeighted = function (weightedArrays) {
+  var sum = 0, rand = _.random(100, true);
+  var cur, i;
+  for (i = 0, _len = weightedArrays.length; i < _len; i++) {
+    cur = weightedArrays[i];
+    sum += cur[1];
+    if (sum > rand) return cur[0];
+  } return false;
+};
+
 /**
  * CommonJS exports
  * @type {Object}

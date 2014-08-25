@@ -280,35 +280,40 @@ function Terrarium(width, height, id, cellSize, insertAfter) {
 }
 
 /**
- * Populates a terrarium with a set distribution of creatures
- * @param  {array} creatures  an array of arrays of the form [string 'creatureName', int fillPercent]
- * @param  {[type]} grid      the grid to fill
+ * Create a grid and fill it by using a function, 2-d array, or uniform type
+ * @param  {*} content  if  function, fill grid according to fn(x, y)
+ *                        if array, fill grid cells with the corresponding creatureType
+ *                        if string, fill grid with that creatureType
+ *                        otherwise, create empty grid
+ * @return {grid}       a grid adhering to the above rules
  */
-Terrarium.prototype.populate = function (creatures, grid) {
-  function pickCreature(accum, creature) {
-    var percentage = accum + creature[1];
-    if (!current && percentage > rand) {
-      current = creatureFactory.make(creature[0]);
+Terrarium.prototype.makeGrid = function (content) {
+  var grid = [], type = typeof content, creature;
+  for (var x = 0, _w = this.width; x < _w; x++) {
+    grid.push([]);
+    for (var y = 0, _h = this.height; y < _h; y++) {
+      grid[x].push(creatureFactory.make(
+        type === 'function' ? content(x, y) :
+        type === 'object' && content.length ? (content[y] || [])[x] :
+        type === 'string' ? content :
+        undefined
+      ));
     }
-    return percentage;
-  }
+  } return grid;
+};
 
-  var current, rand = 0;
-  if (!grid) grid = this.grid;
-
-  for (var x = this.width; x--;) {
-    grid[x] = [];
-    // populate the array with creatures if provided,
-    // otherwise leave it sparse
-    if (creatures) {
-      for (var y = this.height; y--;) {
-        current = false;
-        rand = _.random(100, true);
-        _.reduce(creatures, pickCreature, 0);
-        grid[x].push(current);
-      }
+/**
+ * Create a grid and fill it randomly with a set creature distribution
+ * @param  {array} distribution   an array of arrays of the form [string 'creatureName', float fillPercent]
+ */
+Terrarium.prototype.makeGridWithDistribution = function (distribution) {
+  var current, rand = 0, grid = [];
+  for (var x = 0, _w = this.width; x < _w; x++) {
+    grid.push([]);
+    for (var y = 0, _h = this.height; y < _h; y++) {
+      grid[x].push(creatureFactory.make(_.pickRandomWeighted(distribution)));
     }
-  }
+  } return grid;
 };
 
 /**
@@ -320,7 +325,7 @@ Terrarium.prototype.step = function (steps) {
   function copyAndRemoveInner (origCreature) {
     if (origCreature) {
       var copy = _.assign(new (origCreature.constructor)(), origCreature);
-      return copy.isDead() ? false : copy;
+      return copy && !copy.isDead() ? copy : false;
     } else return false;
   }
 
@@ -378,7 +383,7 @@ Terrarium.prototype.step = function (steps) {
       var winnerCreature = winner.creature;
 
       // clear the original creature's square if successFn returns false
-      if (winnerCreature.successFn() === false) {
+      if (!winnerCreature.successFn()) {
         newGrid[winner.x][winner.y] = false;
       }
 
@@ -411,8 +416,7 @@ Terrarium.prototype.step = function (steps) {
     newGrid = _.map(oldGrid, copyAndRemove);
 
     // create an empty grid to hold creatures competing for the same square
-    eigenGrid = [];
-    this.populate(false, eigenGrid);
+    eigenGrid = this.makeGrid();
 
     // Add each creature's intended destination to the eigenGrid
     _.each(newGrid, processCreatures);
@@ -496,6 +500,16 @@ _.getNeighborCoords = function (x0, y0, xMax, yMax, radius) {
         coords.push({ x: x, y: y });
 
   return coords;
+};
+
+_.pickRandomWeighted = function (weightedArrays) {
+  var sum = 0, rand = _.random(100, true);
+  var cur, i;
+  for (i = 0, _len = weightedArrays.length; i < _len; i++) {
+    cur = weightedArrays[i];
+    sum += cur[1];
+    if (sum > rand) return cur[0];
+  } return false;
 };
 
 /**
