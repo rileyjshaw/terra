@@ -1,6 +1,6 @@
 {
   "name": "terra",
-  "version": "1.0.0-alpha",
+  "version": "1.0.0-beta",
   "description": "A JavaScript framework for simple biological simulations and cellular automata.",
   "main": "dist/terra.min.js",
   "scripts": {
