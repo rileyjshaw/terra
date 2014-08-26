@@ -84,7 +84,7 @@ ex1.grid = ex1.makeGridWithDistribution([['secondCreature', 10], ['simplePlant',
 terra.registerCA({
   type: 'GoL',
   colorFn: function () { return this.alive ? this.color + ',1' : '0,0,0,0'; },
-  queue: function (neighbors) {
+  process: function (neighbors) {
     var surrounding = neighbors.filter(function (spot) {
       return spot.creature.alive;
     }).length;
@@ -105,7 +105,7 @@ terra.registerCA({
   type: 'cyclic',
   colors: ['255,0,0,1', '255,96,0,1', '255,191,0,1', '223,255,0,1', '128,255,0,1', '32,255,0,1', '0,255,64,1', '0,255,159,1', '0,255,255,1', '0,159,255,1', '0,64,255,1', '32,0,255,1', '127,0,255,1', '223,0,255,1', '255,0,191,1', '255,0,96,1'],
   colorFn: function () { return this.colors[this.state];},
-  queue: function (neighbors) {
+  process: function (neighbors) {
     var next = (this.state + 1) % 16;
     var changing = neighbors.some(function (spot) {
       return spot.creature.state === next;
@@ -245,13 +245,13 @@ bbTerrarium.animate();</code></pre>
         <h4><span class="token keyword">float</span> moveLv</h4>
         <p></p>
         <ul>
-          <p>Percentage of a creature's max energy below which it will stop moving (used in the default <a data-scroll href="#queue">queue</a> method).</p>
+          <p>Percentage of a creature's max energy below which it will stop moving (used in the default <a data-scroll href="#process">process</a> method).</p>
           <li>Default: 0</li>
           <li>Range: [0, 1]</li>
         </ul>
       </li>
-      <li id="queue">
-        <h4><span class="token keyword">function</span> queue</h4>
+      <li id="process">
+        <h4><span class="token keyword">function</span> process</h4>
         <p>Main entry point for behavior; called for each creature on each iteration.</p>
         <ul>
           <li>Parameters: <span class="mono"><span class="token keyword">{coords, creature} []</span> neighbors</span></li>
@@ -270,7 +270,7 @@ bbTerrarium.animate();</code></pre>
       </li>
       <li>
         <h4><span class="token keyword">float</span> reproduceLv</h4>
-        <p>Percentage of a creature's max energy above which it will reproduce (used in the default <a data-scroll href="#queue">queue</a> method).</p>
+        <p>Percentage of a creature's max energy above which it will reproduce (used in the default <a data-scroll href="#process">process</a> method).</p>
         <ul>
           <li>Default: 0.7</li>
           <li>Range: [0, 1]</li>
