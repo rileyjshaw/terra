@@ -107,7 +107,7 @@ var factory = (function () {
     return true;
   };
 
-  baseCreature.prototype.queue = function (neighbors) {
+  baseCreature.prototype.process = function (neighbors) {
     var step = {};
     var maxEnergy = this.maxEnergy;
 
@@ -133,7 +133,7 @@ var factory = (function () {
 
   baseCA.prototype.boundEnergy = function () {};
   baseCA.prototype.isDead = function () { return false; };
-  baseCA.prototype.queue = function (neighbors) {};
+  baseCA.prototype.process = function (neighbors) {};
   baseCA.prototype.wait = function () {};
 
   // Storage for our creature types
@@ -391,7 +391,7 @@ Terrarium.prototype.step = function (steps) {
         _.getNeighborCoords(x, y, gridWidth - 1, gridHeight - 1, creature.actionRadius),
         zipCoordsWithNeighbors
       );
-      var result = creature.queue(neighbors);
+      var result = creature.process(neighbors);
       if (result) {
         var eigenColumn = eigenGrid[result.x];
         if (!eigenColumn[result.y]) eigenColumn[result.y] = [];

@@ -96,7 +96,7 @@ var factory = (function () {
     return true;
   };
 
-  baseCreature.prototype.queue = function (neighbors) {
+  baseCreature.prototype.process = function (neighbors) {
     var step = {};
     var maxEnergy = this.maxEnergy;
 
@@ -122,7 +122,7 @@ var factory = (function () {
 
   baseCA.prototype.boundEnergy = function () {};
   baseCA.prototype.isDead = function () { return false; };
-  baseCA.prototype.queue = function (neighbors) {};
+  baseCA.prototype.process = function (neighbors) {};
   baseCA.prototype.wait = function () {};
 
   // Storage for our creature types

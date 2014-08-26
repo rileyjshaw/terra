@@ -99,7 +99,7 @@ Terrarium.prototype.step = function (steps) {
         _.getNeighborCoords(x, y, gridWidth - 1, gridHeight - 1, creature.actionRadius),
         zipCoordsWithNeighbors
       );
-      var result = creature.queue(neighbors);
+      var result = creature.process(neighbors);
       if (result) {
         var eigenColumn = eigenGrid[result.x];
         if (!eigenColumn[result.y]) eigenColumn[result.y] = [];
