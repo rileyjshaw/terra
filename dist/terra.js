@@ -1,20 +1,22 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.terra=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var Terrarium = require('./terrarium.js');
-var creatureFactory = require('./creature.js');
+var factory = require('./creature.js');
 
 module.exports = {
   Terrarium: Terrarium,
-  creatureFactory: creatureFactory
+  registerCreature: factory.registerCreature,
+  registerCA: factory.registerCA
 };
 
 },{"./creature.js":2,"./terrarium.js":5}],2:[function(require,module,exports){
 var _ = require('./util.js');
 
 // abstract factory that adds a superclass of baseCreature
-var creatureFactory = (function () {
+var factory = (function () {
   function baseCreature() {
     this.age = 0;
   }
+  function baseCA() {}
 
   baseCreature.prototype.initialEnergy = 50;
   baseCreature.prototype.maxEnergy = 100;
@@ -43,7 +45,7 @@ var creatureFactory = (function () {
     if (spots.length) {
       var step = spots[_.random(spots.length - 1)];
       var coords = step.coords;
-      var creature = creatureFactory.make(this.type);
+      var creature = factory.make(this.type);
 
       var successFn = (function () {
         this.energy -= this.initialEnergy;
@@ -129,6 +131,11 @@ var creatureFactory = (function () {
     } else return false;
   };
 
+  baseCA.prototype.boundEnergy = function () {};
+  baseCA.prototype.isDead = function () { return false; };
+  baseCA.prototype.queue = function (neighbors) {};
+  baseCA.prototype.wait = function () {};
+
   // Storage for our creature types
   var types = {};
 
@@ -138,7 +145,7 @@ var creatureFactory = (function () {
       return (Creature ? new Creature(options) : false);
     },
 
-    register: function (options, init) {
+    registerCreature: function (options, init) {
       // required attributes
       var type = options.type;
       // only register classes that fulfill the creature contract
@@ -174,11 +181,38 @@ var creatureFactory = (function () {
 
         return true;
       } else return false;
+    },
+
+    registerCA: function (options, init) {
+      // required attributes
+      var type = options.type;
+      // only register classes that fulfill the creature contract
+      if (typeof type === 'string' && typeof types[type] === 'undefined') {
+        // set the constructor, including init if it's defined
+        types[type] = typeof init === 'function' ?
+           function () { init.call(this); } :
+           function () {};
+
+        var color = options.color;
+        // set the color randomly if none is provided
+        if (typeof color !== 'object' || color.length !== 3) {
+          options.color = [_.random(255), _.random(255), _.random(255)];
+        }
+
+        types[type].prototype = new baseCA();
+        types[type].prototype.constructor = types[type];
+
+        _.each(options, function(value, key) {
+          types[type].prototype[key] = value;
+        });
+
+        return true;
+      } else return false;
     }
   };
 })();
 
-module.exports = creatureFactory;
+module.exports = factory;
 
 },{"./util.js":6}],3:[function(require,module,exports){
 var _ = require('./util.js');
@@ -257,7 +291,7 @@ module.exports = {
 
 },{}],5:[function(require,module,exports){
 var _ = require('./util');
-var creatureFactory = require('./creature.js');
+var factory = require('./creature.js');
 var display = require('./display.js');
 var dom = require('./dom.js');
 
@@ -292,7 +326,7 @@ Terrarium.prototype.makeGrid = function (content) {
   for (var x = 0, _w = this.width; x < _w; x++) {
     grid.push([]);
     for (var y = 0, _h = this.height; y < _h; y++) {
-      grid[x].push(creatureFactory.make(
+      grid[x].push(factory.make(
         type === 'function' ? content(x, y) :
         type === 'object' && content.length ? (content[y] || [])[x] :
         type === 'string' ? content :
@@ -311,7 +345,7 @@ Terrarium.prototype.makeGridWithDistribution = function (distribution) {
   for (var x = 0, _w = this.width; x < _w; x++) {
     grid.push([]);
     for (var y = 0, _h = this.height; y < _h; y++) {
-      grid[x].push(creatureFactory.make(_.pickRandomWeighted(distribution)));
+      grid[x].push(factory.make(_.pickRandomWeighted(distribution)));
     }
   } return grid;
 };

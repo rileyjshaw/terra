@@ -1,10 +1,11 @@
 var _ = require('./util.js');
 
 // abstract factory that adds a superclass of baseCreature
-var creatureFactory = (function () {
+var factory = (function () {
   function baseCreature() {
     this.age = 0;
   }
+  function baseCA() {}
 
   baseCreature.prototype.initialEnergy = 50;
   baseCreature.prototype.maxEnergy = 100;
@@ -33,7 +34,7 @@ var creatureFactory = (function () {
     if (spots.length) {
       var step = spots[_.random(spots.length - 1)];
       var coords = step.coords;
-      var creature = creatureFactory.make(this.type);
+      var creature = factory.make(this.type);
 
       var successFn = (function () {
         this.energy -= this.initialEnergy;
@@ -119,6 +120,11 @@ var creatureFactory = (function () {
     } else return false;
   };
 
+  baseCA.prototype.boundEnergy = function () {};
+  baseCA.prototype.isDead = function () { return false; };
+  baseCA.prototype.queue = function (neighbors) {};
+  baseCA.prototype.wait = function () {};
+
   // Storage for our creature types
   var types = {};
 
@@ -128,7 +134,7 @@ var creatureFactory = (function () {
       return (Creature ? new Creature(options) : false);
     },
 
-    register: function (options, init) {
+    registerCreature: function (options, init) {
       // required attributes
       var type = options.type;
       // only register classes that fulfill the creature contract
@@ -164,8 +170,35 @@ var creatureFactory = (function () {
 
         return true;
       } else return false;
+    },
+
+    registerCA: function (options, init) {
+      // required attributes
+      var type = options.type;
+      // only register classes that fulfill the creature contract
+      if (typeof type === 'string' && typeof types[type] === 'undefined') {
+        // set the constructor, including init if it's defined
+        types[type] = typeof init === 'function' ?
+           function () { init.call(this); } :
+           function () {};
+
+        var color = options.color;
+        // set the color randomly if none is provided
+        if (typeof color !== 'object' || color.length !== 3) {
+          options.color = [_.random(255), _.random(255), _.random(255)];
+        }
+
+        types[type].prototype = new baseCA();
+        types[type].prototype.constructor = types[type];
+
+        _.each(options, function(value, key) {
+          types[type].prototype[key] = value;
+        });
+
+        return true;
+      } else return false;
     }
   };
 })();
 
-module.exports = creatureFactory;
+module.exports = factory;

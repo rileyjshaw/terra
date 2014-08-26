@@ -1,5 +1,5 @@
 var _ = require('./util');
-var creatureFactory = require('./creature.js');
+var factory = require('./creature.js');
 var display = require('./display.js');
 var dom = require('./dom.js');
 
@@ -34,7 +34,7 @@ Terrarium.prototype.makeGrid = function (content) {
   for (var x = 0, _w = this.width; x < _w; x++) {
     grid.push([]);
     for (var y = 0, _h = this.height; y < _h; y++) {
-      grid[x].push(creatureFactory.make(
+      grid[x].push(factory.make(
         type === 'function' ? content(x, y) :
         type === 'object' && content.length ? (content[y] || [])[x] :
         type === 'string' ? content :
@@ -53,7 +53,7 @@ Terrarium.prototype.makeGridWithDistribution = function (distribution) {
   for (var x = 0, _w = this.width; x < _w; x++) {
     grid.push([]);
     for (var y = 0, _h = this.height; y < _h; y++) {
-      grid[x].push(creatureFactory.make(_.pickRandomWeighted(distribution)));
+      grid[x].push(factory.make(_.pickRandomWeighted(distribution)));
     }
   } return grid;
 };
