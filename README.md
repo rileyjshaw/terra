@@ -13,6 +13,10 @@ bower install
 gulp
 ```
 
-That's all, folks!
+## Contributing
+At this stage **the most important way you can help is to use the library**. The API is in Beta and still flexible. If you discover something that's confusing or hard to work with, document it [here](https://github.com/rileyjshaw/terra/issues). Come up with an idea and try to build it; by using and testing the library you'll find bugs or usability issues that would otherwise go unnoticed.
+If you want to make a pull-request on anything labelled 'major', be sure to join the discussion first so we can talk architecture.
+If anyone's willing to get the ball rolling on [unit tests](https://github.com/rileyjshaw/terra/issues/16), [you will be my hero](http://youtu.be/koJlIGDImiU).
 
-MIT, remixing strongly encouraged.
+
+That's all, folks! MIT, remixing strongly encouraged.
