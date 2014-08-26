@@ -51,12 +51,12 @@ window.terra;</code></pre>
     <pre><code class="language-bash">bower install terra</code></pre>
 
     <h3>Creating creatures</h3>
-    <p>Let's create a simple creature using the creatureFactory. Each creature requires a type.</p>
-    <pre><code class="language-javascript">terra.creatureFactory.register({
+    <p>Let's create a simple creature using the registerCreature method. Each creature requires a type.</p>
+    <pre><code class="language-javascript">terra.registerCreature({
   type: 'firstCreature'
 });</code></pre>
     <p>This creature is valid, but it's pretty boring. To make a more interesting creature, let's override some of the default <a data-scroll href="#creatures">attributes and methods</a>.</p>
-    <pre><code class="language-javascript">terra.creatureFactory.register({
+    <pre><code class="language-javascript">terra.registerCreature({
   type: 'secondCreature',
   color: [120, 0, 240],
   sustainability: 6,
@@ -81,13 +81,11 @@ ex1.grid = ex1.makeGridWithDistribution([['secondCreature', 10], ['simplePlant',
     <h3 id="gol">Conway's Game of Life <a class="question" target="_blank" href="http://en.wikipedia.org/wiki/Conway's_Game_of_Life">?</a></h3>
     <pre><code class="language-javascript">var gameOfLife = new terra.Terrarium(25, 25);
 
-terra.creatureFactory.register({
+terra.registerCA({
   type: 'GoL',
   colorFn: function () { return this.alive ? this.color + ',1' : '0,0,0,0'; },
-  wait: function () {},
-  isDead: function () { return false; },
   queue: function (neighbors) {
-    var surrounding = _.filter(neighbors, function (spot) {
+    var surrounding = neighbors.filter(function (spot) {
       return spot.creature.alive;
     }).length;
     this.alive = surrounding === 3 || surrounding === 2 &amp;&amp; this.alive;
@@ -103,15 +101,13 @@ gameOfLife.animate();</code></pre>
     <h3 id="cyclic">Cyclic Cellular Automaton <a class="question" target="_blank" href="http://en.wikipedia.org/wiki/Cyclic_cellular_automaton">?</a></h3>
     <pre><code class="language-javascript">var cyclic = new terra.Terrarium(100, 100);
 
-terra.creatureFactory.register({
+terra.registerCA({
   type: 'cyclic',
   colors: ['255,0,0,1', '255,96,0,1', '255,191,0,1', '223,255,0,1', '128,255,0,1', '32,255,0,1', '0,255,64,1', '0,255,159,1', '0,255,255,1', '0,159,255,1', '0,64,255,1', '32,0,255,1', '127,0,255,1', '223,0,255,1', '255,0,191,1', '255,0,96,1'],
   colorFn: function () { return this.colors[this.state];},
-  wait: function () {},
-  isDead: function () { return false; },
   queue: function (neighbors) {
     var next = (this.state + 1) % 16;
-    var changing = _.some(neighbors, function (spot) {
+    var changing = neighbors.some(function (spot) {
       return spot.creature.state === next;
     });
     if (changing) this.state = next;
@@ -127,7 +123,7 @@ cyclic.animate();</code></pre>
     <pre><code class="language-javascript">// the demo running at the top of this page
 var bbTerrarium = new terra.Terrarium(25, 25);
 
-terra.creatureFactory.register({
+terra.registerCreature({
   type: 'plant',
   color: [0, 120, 0],
   size: 10,
@@ -141,7 +137,7 @@ terra.creatureFactory.register({
   reproduceLv: 0.65
 });
 
-creatureFactory.register({
+terra.registerCreature({
   type: 'brute',
   color: [0, 255, 255],
   maxEnergy: 50,
@@ -149,7 +145,7 @@ creatureFactory.register({
   size: 20
 });
 
-creatureFactory.register({
+terra.registerCreature({
   type: 'bully',
   color: [241, 196, 15],
   initialEnergy: 20,
@@ -163,7 +159,7 @@ bbTerrarium.animate();</code></pre>
   <p>If you come up with a cool example, <a href="mailto:i@rileyjshaw.com">let me know</a>! I'll add it to this list and credit you.</p>
 
     <h2 id="creatures">Creatures</h2>
-    <p>Creatures are registered with <pre><code class="language-javascript">terra.creatureFactory.register(options, init)</code></pre></p>
+    <p>Creatures are registered with <pre><code class="language-javascript">terra.registerCreature(options, init)</code></pre> or <pre><code class="language-javascript">terra.registerCA(options, init)</code></pre> for cellular automata.</p>
 
     <p>The following methods and attributes can be passed in an object as the first argument:</p>
     <h3 id="creatureOptions">Required</h3>
@@ -225,6 +221,7 @@ bbTerrarium.animate();</code></pre>
         <p>Determines whether a creature should be removed at the beginning of a step.</p>
         <ul>
           <li>Returns: <span class="mono"><span class="token keyword">boolean</span></span></li>
+          <li>Default: Return true for creatures with energy &lt;= 0. Return false always for cellular automata.</li>
         </ul>
       </li>
       <li id="maxEnergy">
@@ -258,7 +255,7 @@ bbTerrarium.animate();</code></pre>
         <p>Main entry point for behavior; called for each creature on each iteration.</p>
         <ul>
           <li>Parameters: <span class="mono"><span class="token keyword">{coords, creature} []</span> neighbors</span></li>
-          <li>Default: Reproduce if energy is sufficient, otherwise move if energy is sufficient, otherwise wait.</li>
+          <li>Default: Creatures reproduce if energy is sufficient, otherwise move if energy is sufficient, otherwise wait. Cellular automata do nothing by default.</li>
           <li>Returns: <span class="mono">{x, y, creature} || false</span></li>
         </ul>
       </li>
@@ -298,7 +295,7 @@ bbTerrarium.animate();</code></pre>
         <h4><span class="token keyword">function</span> wait</h4>
         <p>What happens when a creature waits.</p>
         <ul>
-          <li>Default: Creature loses 5 energy.</li>
+          <li>Default: Creatures lose 5 energy. No effect for cellular automata.</li>
         </ul>
       </li>
       <li id="customOptions">
@@ -307,7 +304,7 @@ bbTerrarium.animate();</code></pre>
       </li>
     </ul>
 
-    <p>The second argument to terra.creatureFactory.register is the init function. This function is run within a creature's constructor and allows you to set different attributes for individual creatures. For example, in the <a data-scroll href="#cyclic">Cyclic Cellular Automaton</a> example above we see the following init function:</p>
+    <p>The second argument to the terra.registerCreature and terra.registerCA is the init function. This function is run within a creature's constructor and allows you to set different attributes for individual creatures. For example, in the <a data-scroll href="#cyclic">Cyclic Cellular Automaton</a> example above we see the following init function:</p>
     <pre><code class="language-javascript">function () {
   this.state = Math.floor(Math.random() * 16);
 });</code></pre>
@@ -354,8 +351,8 @@ var t = new terra.Terrarium(4, 4, 'myTerrarium', 15, document.getElementById('bu
     <p id="terrariumMethods">Once initialized, terrariums have a few exposed methods. Using our terrarium <code class="language-javascript">t</code> that we just created:</p>
     <pre><code class="language-javascript">//initial setup
 var a = 'a', b = 'b';
-terra.creatureFactory.register({type: a});
-terra.creatureFactory.register({type: b});
+terra.registerCreature({type: a});
+terra.registerCreature({type: b});
 
 /* makeGrid(content)
  *
