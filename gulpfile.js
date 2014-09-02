@@ -89,6 +89,10 @@ gulp.task('css_concat', ['sass'], function () {
 
 gulp.task('watch', function() {
   gulp.watch([paths.app.all, paths.app.ext], ['lint', 'scripts']);
+});
+
+gulp.task('watchSite', function() {
+  gulp.watch([paths.app.all, paths.app.ext], ['lint', 'scripts']);
   gulp.watch(paths.demo.scripts, ['demo','js_concat']);
   gulp.watch([paths.demo.stylesheets.sass, paths.demo.stylesheets.css], ['sass', 'css_concat']);
 });
@@ -107,4 +111,5 @@ gulp.task('webserver', function() {
     }));
 });
 
-gulp.task( 'default', [ 'lint', 'scripts', 'demo', 'js_concat', 'sass', 'css_concat', 'webserver', 'watch' ] );
+gulp.task( 'default', [ 'lint', 'scripts', 'watch' ] );
+gulp.task( 'site', [ 'lint', 'scripts', 'demo', 'js_concat', 'sass', 'css_concat', 'webserver', 'watchSite' ] );
