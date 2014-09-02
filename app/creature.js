@@ -5,7 +5,9 @@ var factory = (function () {
   function baseCreature() {
     this.age = 0;
   }
-  function baseCA() {}
+  function baseCA() {
+    this.age = 0;
+  }
 
   baseCreature.prototype.initialEnergy = 50;
   baseCreature.prototype.maxEnergy = 100;
@@ -96,7 +98,7 @@ var factory = (function () {
     return true;
   };
 
-  baseCreature.prototype.process = function (neighbors) {
+  baseCreature.prototype.process = function (neighbors, x, y) {
     var step = {};
     var maxEnergy = this.maxEnergy;
 
@@ -122,7 +124,7 @@ var factory = (function () {
 
   baseCA.prototype.boundEnergy = function () {};
   baseCA.prototype.isDead = function () { return false; };
-  baseCA.prototype.process = function (neighbors) {};
+  baseCA.prototype.process = function (neighbors, x, y) {};
   baseCA.prototype.wait = function () {};
 
   // Storage for our creature types

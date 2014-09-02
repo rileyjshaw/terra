@@ -1,7 +1,7 @@
 terra
 =====
 
-JS framework for cellular automata and simple biological simulations. Documentation and examples live [here](http://rileyjshaw.com/terra/).
+JS library for cellular automata and simple biological simulations. Documentation and examples live [here](http://rileyjshaw.com/terra/).
 
 ## Hacking this library
 To build terra on your machine you'll need [Node.js](http://nodejs.org/), [Bower](http://bower.io/), and [gulp](http://gulpjs.com/) installed. Then...

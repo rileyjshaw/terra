@@ -67,6 +67,7 @@ Terrarium.prototype.step = function (steps) {
   function copyAndRemoveInner (origCreature) {
     if (origCreature) {
       var copy = _.assign(new (origCreature.constructor)(), origCreature);
+      copy.age++;
       return copy && !copy.isDead() ? copy : false;
     } else return false;
   }
@@ -99,7 +100,7 @@ Terrarium.prototype.step = function (steps) {
         _.getNeighborCoords(x, y, gridWidth - 1, gridHeight - 1, creature.actionRadius),
         zipCoordsWithNeighbors
       );
-      var result = creature.process(neighbors);
+      var result = creature.process(neighbors, x, y);
       if (result) {
         var eigenColumn = eigenGrid[result.x];
         if (!eigenColumn[result.y]) eigenColumn[result.y] = [];
