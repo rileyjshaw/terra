@@ -11,7 +11,7 @@
     <div class="vcent"></div>
     <header id="header">
       <h1>terra.js <span>beta</span></h1>
-      <p>A JavaScript framework for simple biological simulations and cellular automata.</p>
+      <p>A JavaScript library for simple biological simulations and cellular automata.</p>
       <a data-scroll href="#main" id="scroller1" class="downArrow">⬇</a>
     </header>
   </div>
@@ -27,7 +27,7 @@
   </nav>
 
   <div id="main" class="main">
-    <p>terra is a <strong>super customizable</strong> framework for creating and analyzing biological simulations. It's open-source and licenced under MIT.</p>
+    <p>terra is a <strong>super customizable</strong> library for creating and analyzing biological simulations. It's open-source and licenced under MIT.</p>
 
     <h2 id="usage">Usage</h2>
 
@@ -84,7 +84,7 @@ ex1.grid = ex1.makeGridWithDistribution([['secondCreature', 10], ['simplePlant',
 terra.registerCA({
   type: 'GoL',
   colorFn: function () { return this.alive ? this.color + ',1' : '0,0,0,0'; },
-  process: function (neighbors) {
+  process: function (neighbors, x, y) {
     var surrounding = neighbors.filter(function (spot) {
       return spot.creature.alive;
     }).length;
@@ -105,7 +105,7 @@ terra.registerCA({
   type: 'cyclic',
   colors: ['255,0,0,1', '255,96,0,1', '255,191,0,1', '223,255,0,1', '128,255,0,1', '32,255,0,1', '0,255,64,1', '0,255,159,1', '0,255,255,1', '0,159,255,1', '0,64,255,1', '32,0,255,1', '127,0,255,1', '223,0,255,1', '255,0,191,1', '255,0,96,1'],
   colorFn: function () { return this.colors[this.state];},
-  process: function (neighbors) {
+  process: function (neighbors, x, y) {
     var next = (this.state + 1) % 16;
     var changing = neighbors.some(function (spot) {
       return spot.creature.state === next;
@@ -254,7 +254,7 @@ bbTerrarium.animate();</code></pre>
         <h4><span class="token keyword">function</span> process</h4>
         <p>Main entry point for behavior; called for each creature on each iteration.</p>
         <ul>
-          <li>Parameters: <span class="mono"><span class="token keyword">{coords, creature} []</span> neighbors</span></li>
+          <li>Parameters: <span class="mono"><span class="token keyword">{coords, creature} []</span> neighbors, <span class="token keyword">int</span> x, <span class="token keyword">int</span> y</span></li>
           <li>Default: Creatures reproduce if energy is sufficient, otherwise move if energy is sufficient, otherwise wait. Cellular automata do nothing by default.</li>
           <li>Returns: <span class="mono">{x, y, creature} || false</span></li>
         </ul>
