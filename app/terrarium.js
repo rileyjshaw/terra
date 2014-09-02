@@ -30,7 +30,7 @@ function Terrarium(width, height, id, cellSize, insertAfter) {
  * @return {grid}       a grid adhering to the above rules
  */
 Terrarium.prototype.makeGrid = function (content) {
-  var grid = [], type = typeof content, creature;
+  var grid = [], type = typeof content;
   for (var x = 0, _w = this.width; x < _w; x++) {
     grid.push([]);
     for (var y = 0, _h = this.height; y < _h; y++) {
@@ -190,7 +190,7 @@ Terrarium.prototype.animate = function (steps, fn) {
     if (i++ !== steps) self.nextFrame = requestAnimationFrame(tick);
     else {
       self.nextFrame = false;
-      fn();
+      if (fn) fn();
     }
   }
 

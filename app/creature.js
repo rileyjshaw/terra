@@ -3,10 +3,10 @@ var _ = require('./util.js');
 // abstract factory that adds a superclass of baseCreature
 var factory = (function () {
   function baseCreature() {
-    this.age = 0;
+    this.age = -1;
   }
   function baseCA() {
-    this.age = 0;
+    this.age = -1;
   }
 
   baseCreature.prototype.initialEnergy = 50;

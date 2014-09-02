@@ -14,9 +14,11 @@ var _ = require('./util.js');
 // abstract factory that adds a superclass of baseCreature
 var factory = (function () {
   function baseCreature() {
-    this.age = 0;
+    this.age = -1;
   }
-  function baseCA() {}
+  function baseCA() {
+    this.age = -1;
+  }
 
   baseCreature.prototype.initialEnergy = 50;
   baseCreature.prototype.maxEnergy = 100;
@@ -107,7 +109,7 @@ var factory = (function () {
     return true;
   };
 
-  baseCreature.prototype.process = function (neighbors) {
+  baseCreature.prototype.process = function (neighbors, x, y) {
     var step = {};
     var maxEnergy = this.maxEnergy;
 
@@ -133,7 +135,7 @@ var factory = (function () {
 
   baseCA.prototype.boundEnergy = function () {};
   baseCA.prototype.isDead = function () { return false; };
-  baseCA.prototype.process = function (neighbors) {};
+  baseCA.prototype.process = function (neighbors, x, y) {};
   baseCA.prototype.wait = function () {};
 
   // Storage for our creature types
@@ -322,7 +324,7 @@ function Terrarium(width, height, id, cellSize, insertAfter) {
  * @return {grid}       a grid adhering to the above rules
  */
 Terrarium.prototype.makeGrid = function (content) {
-  var grid = [], type = typeof content, creature;
+  var grid = [], type = typeof content;
   for (var x = 0, _w = this.width; x < _w; x++) {
     grid.push([]);
     for (var y = 0, _h = this.height; y < _h; y++) {
@@ -359,6 +361,7 @@ Terrarium.prototype.step = function (steps) {
   function copyAndRemoveInner (origCreature) {
     if (origCreature) {
       var copy = _.assign(new (origCreature.constructor)(), origCreature);
+      copy.age++;
       return copy && !copy.isDead() ? copy : false;
     } else return false;
   }
@@ -391,7 +394,7 @@ Terrarium.prototype.step = function (steps) {
         _.getNeighborCoords(x, y, gridWidth - 1, gridHeight - 1, creature.actionRadius),
         zipCoordsWithNeighbors
       );
-      var result = creature.process(neighbors);
+      var result = creature.process(neighbors, x, y);
       if (result) {
         var eigenColumn = eigenGrid[result.x];
         if (!eigenColumn[result.y]) eigenColumn[result.y] = [];
@@ -481,7 +484,7 @@ Terrarium.prototype.animate = function (steps, fn) {
     if (i++ !== steps) self.nextFrame = requestAnimationFrame(tick);
     else {
       self.nextFrame = false;
-      fn();
+      if (fn) fn();
     }
   }
 
