@@ -156,7 +156,30 @@ terra.registerCreature({
 bbTerrarium.grid = bbTerrarium.makeGridWithDistribution([['plant', 50], ['brute', 5], ['bully', 5]]);
 bbTerrarium.animate();</code></pre>
 
-  <p>If you come up with a cool example, <a href="mailto:i@rileyjshaw.com">let me know</a>! I'll add it to this list and credit you.</p>
+    <h3 id="rule146">Rule 146</h3>
+    <pre><code class="language-javascript">var elementary = new terra.Terrarium(150, 150);
+
+factory.registerCA({
+  type: 'elementary',
+  alive: false,
+  ruleset: [1, 0, 0, 1, 0, 0, 1, 0].reverse(), // rule 146
+  colorFn: function () { return this.alive ? this.color + ',1' : '0,0,0,0'; },
+  process: function (neighbors, x, y) {
+    if (this.age === y) {
+      var index = neighbors.filter(function (neighbor) { return neighbor.coords.y === y - 1;
+      }).map(function (neighbor) { return neighbor.creature.alive ? 1 : 0; });
+      index = parseInt(index.join(''), 2);
+      this.alive = isNaN(index) ? !x : this.ruleset[index];
+    }
+    return false;
+  }
+});
+
+elementary.grid = elementary.makeGrid('elementary');
+elementary.animate();</code></pre>
+
+
+    <p>If you come up with a cool example, <a href="mailto:i@rileyjshaw.com">let me know</a>! I'll add it to this list and credit you.</p>
 
     <h2 id="creatures">Creatures</h2>
     <p>Creatures are registered with <pre><code class="language-javascript">terra.registerCreature(options, init)</code></pre> or <pre><code class="language-javascript">terra.registerCA(options, init)</code></pre> for cellular automata.</p>
