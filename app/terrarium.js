@@ -19,6 +19,7 @@ function Terrarium(width, height, id, cellSize, insertAfter) {
   this.grid = [];
   this.canvas = dom.createCanvasElement(width, height, cellSize, id, insertAfter);
   this.nextFrame = false;
+  this.hasChanged = false;
 }
 
 /**
@@ -102,6 +103,7 @@ Terrarium.prototype.step = function (steps) {
       );
       var result = creature.process(neighbors, x, y);
       if (result) {
+	    hasChanged = true;
         var eigenColumn = eigenGrid[result.x];
         if (!eigenColumn[result.y]) eigenColumn[result.y] = [];
 
@@ -111,6 +113,7 @@ Terrarium.prototype.step = function (steps) {
           creature: result.creature
         });
       } else {
+		hasChanged = true;
         processLoser(creature);
       }
     }
@@ -122,6 +125,7 @@ Terrarium.prototype.step = function (steps) {
 
   function pickWinnerInner (superposition, x, y) {
     if (superposition) {
+	  hasChanged = true;
       var winner = superposition.splice(_.random(superposition.length - 1), 1)[0];
       var winnerCreature = winner.creature;
 
@@ -186,6 +190,10 @@ Terrarium.prototype.draw = function () {
 Terrarium.prototype.animate = function (steps, fn) {
   function tick () {
     self.grid = self.step();
+	if(!hasChanged){
+		self.stop();
+	}
+	hasChanged = false;
     self.draw();
     if (i++ !== steps) self.nextFrame = requestAnimationFrame(tick);
     else {
