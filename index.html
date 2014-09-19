@@ -89,7 +89,7 @@ terra.registerCA({
       return spot.creature.alive;
     }).length;
     this.alive = surrounding === 3 || surrounding === 2 &amp;&amp; this.alive;
-    return false;
+    return true;
   }
 }, function () {
   this.alive = Math.random() &lt; 0.5;
@@ -111,6 +111,7 @@ terra.registerCA({
       return spot.creature.state === next;
     });
     if (changing) this.state = next;
+    return true;
   }
 }, function () {
   this.state = Math.floor(Math.random() * 16);
@@ -171,7 +172,7 @@ terra.registerCA({
       index = parseInt(index.join(''), 2);
       this.alive = isNaN(index) ? !x : this.ruleset[index];
     }
-    return false;
+    return true;
   }
 });
 
@@ -279,7 +280,13 @@ elementary.animate();</code></pre>
         <ul>
           <li>Parameters: <span class="mono"><span class="token keyword">{coords, creature} []</span> neighbors, <span class="token keyword">int</span> x, <span class="token keyword">int</span> y</span></li>
           <li>Default: Creatures reproduce if energy is sufficient, otherwise move if energy is sufficient, otherwise wait. Cellular automata do nothing by default.</li>
-          <li>Returns: <span class="mono">{x, y, creature} || false</span></li>
+          <li>Returns:
+            <ul>
+              <li><span class="mono">true</span>: indicates that a change has occurred in the creature; if no creatures return a truthy value, the simulation terminates</li>
+              <li><span class="mono">false</span></li>
+              <li><span class="mono">{x, y, creature, observed}</span>: a creature in a new position; observed acts like <span class="mono">true</span> and <span class="mono">false</span> above and allows watching for specific conditions</li>
+            </ul>
+          </li>
         </ul>
       </li>
       <li>
@@ -416,6 +423,7 @@ t.grid = t.step(10);
 t.draw();
 
 /* animate(steps, fn)
+ * animate(steps)
  *
  * Starts animating the simulation. The simulation will stop after &lt;steps&gt; steps
  *   if specified, and call &lt;fn&gt; as a callback once the animation finishes. */
