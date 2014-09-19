@@ -19,6 +19,7 @@ function Terrarium(width, height, id, cellSize, insertAfter) {
   this.grid = [];
   this.canvas = dom.createCanvasElement(width, height, cellSize, id, insertAfter);
   this.nextFrame = false;
+  this.hasChanged = false;
 }
 
 /**
@@ -67,8 +68,11 @@ Terrarium.prototype.step = function (steps) {
   function copyAndRemoveInner (origCreature) {
     if (origCreature) {
       var copy = _.assign(new (origCreature.constructor)(), origCreature);
+      var dead = copy && copy.isDead();
+      if (dead && !self.hasChanged) self.hasChanged = true;
       copy.age++;
-      return copy && !copy.isDead() ? copy : false;
+
+      return !dead ? copy : false;
     } else return false;
   }
 
@@ -76,6 +80,7 @@ Terrarium.prototype.step = function (steps) {
     return _.map(origCols, copyAndRemoveInner);
   }
 
+  // TODO: Switch coords to just x and y to be consistent w/ pickWinnerInner
   function zipCoordsWithNeighbors (coords) {
     return {
       coords: coords,
@@ -101,16 +106,21 @@ Terrarium.prototype.step = function (steps) {
         zipCoordsWithNeighbors
       );
       var result = creature.process(neighbors, x, y);
-      if (result) {
+      if (typeof result === 'object') {
         var eigenColumn = eigenGrid[result.x];
-        if (!eigenColumn[result.y]) eigenColumn[result.y] = [];
+        var returnedCreature = result.creature;
+        var returnedY = result.y;
 
-        eigenColumn[result.y].push({
+        if (!eigenColumn[returnedY]) eigenColumn[returnedY] = [];
+
+        eigenColumn[returnedY].push({
           x: x,
           y: y,
-          creature: result.creature
+          creature: returnedCreature
         });
+        if (!self.hasChanged && returnedCreature.observed) self.hasChanged = true;
       } else {
+        if (result && !self.hasChanged) self.hasChanged = true;
         processLoser(creature);
       }
     }
@@ -129,7 +139,7 @@ Terrarium.prototype.step = function (steps) {
       if (!winnerCreature.successFn()) {
         newGrid[winner.x][winner.y] = false;
       }
-
+      // TODO: so many calls to this. Can we just run it once at the start of a step?
       winnerCreature.boundEnergy();
 
       // put the winner in its rightful place
@@ -146,6 +156,7 @@ Terrarium.prototype.step = function (steps) {
     _.each(column, function (superposition, y) { pickWinnerInner(superposition, x, y); });
   }
 
+  var self = this;
   var gridWidth = this.width;
   var gridHeight = this.height;
   var oldGrid = this.grid, newGrid, eigenGrid;
@@ -153,6 +164,8 @@ Terrarium.prototype.step = function (steps) {
   if (typeof steps !== 'number') steps = 1;
 
   while (steps--) {
+    this.hasChanged = false;
+
     oldGrid = newGrid ? _.clone(newGrid) : this.grid;
 
     // copy the old grid & remove dead creatures
@@ -166,6 +179,8 @@ Terrarium.prototype.step = function (steps) {
 
     // Choose a winner from each of the eigenGrid's superpositions
     _.each(eigenGrid, pickWinner);
+
+    if (!this.hasChanged) return false;
   }
 
   return newGrid;
@@ -179,19 +194,25 @@ Terrarium.prototype.draw = function () {
 };
 
 /**
- * Starts animating the simulation
+ * Starts animating the simulation. Can be called with only a function.
  * @param  {int}   steps   the simulation will stop after <steps> steps if specified
  * @param  {Function} fn   called as a callback once the animation finishes
  */
 Terrarium.prototype.animate = function (steps, fn) {
   function tick () {
-    self.grid = self.step();
-    self.draw();
-    if (i++ !== steps) self.nextFrame = requestAnimationFrame(tick);
-    else {
-      self.nextFrame = false;
-      if (fn) fn();
-    }
+    var grid = self.step();
+    if (grid) {
+      self.grid = grid;
+      self.draw();
+      if (++i !== steps) return self.nextFrame = requestAnimationFrame(tick);
+    } // if grid hasn't changed || reached last step
+    self.nextFrame = false;
+    if (fn) fn();
+  }
+
+  if (typeof steps === 'function') {
+    fn = steps;
+    steps = null;
   }
 
   if (!this.nextFrame) {

@@ -117,9 +117,10 @@ var factory = (function () {
       return {
         x: step.x,
         y: step.y,
-        creature: creature
+        creature: creature,
+        observed: true
       };
-    } else return false;
+    } else return this.energy !== this.maxEnergy;
   };
 
   baseCA.prototype.boundEnergy = function () {};
