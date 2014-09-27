@@ -7,17 +7,24 @@ var dom = require('./dom.js');
  * Terrarium constructor function
  * @param {int} width             number of cells in the x-direction
  * @param {int} height            number of cells in the y-direction
- * @param {string} id             id assigned to the generated canvas
- * @param {int} cellSize          pixel width of each cell (default 10)
- * @param {string} insertAfter    id of the element to insert the canvas after
+ * @param {object} options
+ *   @param {string} id             id assigned to the generated canvas
+ *   @param {int} cellSize          pixel width of each cell (default 10)
+ *   @param {string} insertAfter    id of the element to insert the canvas after
+ *   @param {float} trails          a number from [0, 1] indicating whether trails should
+ *                                    be drawn (0 = no trails, 1 = neverending trails)
+ *                                    "background" option is required if trails is set
+ *   @param {array} background      an RGB triplet for the canvas' background
  */
-function Terrarium(width, height, id, cellSize, insertAfter) {
-  cellSize = cellSize || 10;
-  this.cellSize = cellSize;
+function Terrarium(width, height, options) {
+  var cellSize = options.cellSize || 10;
   this.width = width;
   this.height = height;
+  this.cellSize = cellSize;
+  this.trails = options.trails;
+  this.background = options.background;
+  this.canvas = dom.createCanvasElement(width, height, cellSize, options.id, options.insertAfter, this.background);
   this.grid = [];
-  this.canvas = dom.createCanvasElement(width, height, cellSize, id, insertAfter);
   this.nextFrame = false;
   this.hasChanged = false;
 }
@@ -190,7 +197,7 @@ Terrarium.prototype.step = function (steps) {
  * Updates the canvas to reflect the current grid
  */
 Terrarium.prototype.draw = function () {
-  display(this.canvas, this.grid, this.cellSize);
+  display(this.canvas, this.grid, this.cellSize, this.trails, this.background);
 };
 
 /**

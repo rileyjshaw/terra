@@ -53,7 +53,7 @@ gulp.task('scripts', ['lint'], function() {
     .pipe(source('terra.js'))
     .pipe(gulp.dest(paths.dist.scripts))
     .pipe($.rename('terra.min.js'))
-    //.pipe($.streamify( $.uglify() ))
+    .pipe($.streamify( $.uglify() ))
     .pipe(gulp.dest(paths.dist.scripts))
 });
 
@@ -76,7 +76,7 @@ gulp.task('sass', function () {
 gulp.task('js_concat', ['demo'], function () {
   return gulp.src(paths.demo.extraScripts.concat(paths.demo.temp + '/*.js'))
     .pipe($.concat('terra.demo.min.js'))
-    //.pipe($.streamify( $.uglify() ))
+    .pipe($.streamify( $.uglify() ))
     .pipe(gulp.dest(paths.dist.demo))
 });
 

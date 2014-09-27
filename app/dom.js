@@ -1,6 +1,6 @@
 // Creates an HD canvas element on page and
 // returns a reference to the element
-var createCanvasElement = function (width, height, cellSize, id, insertAfter) {
+var createCanvasElement = function (width, height, cellSize, id, insertAfter, background) {
   width *= cellSize;
   height *= cellSize;
 
@@ -30,6 +30,7 @@ var createCanvasElement = function (width, height, cellSize, id, insertAfter) {
     ctx.font = 'bold ' + cellSize + 'px Arial';
 
     if (id) canvas.id = id;
+    if (background) canvas.style.background = 'rgb(' + background + ')';
 
     return canvas;
   }

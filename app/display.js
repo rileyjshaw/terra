@@ -1,8 +1,13 @@
 var _ = require('./util.js');
 
-module.exports = function (canvas, grid, cellSize) {
+module.exports = function (canvas, grid, cellSize, trails, background) {
   var ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (trails && background) {
+    ctx.fillStyle = 'rgba(' + background + ',' + (1 - trails) + ')';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  } else if (trails) {
+    throw "Background must also be set for trails";
+  } else ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   _.each(grid, function (column, x) {
     _.each(column, function (creature, y) {
