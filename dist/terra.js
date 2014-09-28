@@ -318,6 +318,7 @@ var dom = require('./dom.js');
  *   @param {array} background      an RGB triplet for the canvas' background
  */
 function Terrarium(width, height, options) {
+  options = options || {};
   var cellSize = options.cellSize || 10;
   this.width = width;
   this.height = height;
