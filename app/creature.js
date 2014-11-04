@@ -123,6 +123,7 @@ var factory = (function () {
     } else return this.energy !== this.maxEnergy;
   };
 
+  baseCA.prototype.actionRadius = 1;
   baseCA.prototype.boundEnergy = function () {};
   baseCA.prototype.isDead = function () { return false; };
   baseCA.prototype.process = function (neighbors, x, y) {};
@@ -154,7 +155,7 @@ var factory = (function () {
           };
         }
 
-        var color = options.color;
+        var color = options.color || options.colour;
         // set the color randomly if none is provided
         if (typeof color !== 'object' || color.length !== 3) {
           options.color = [_.random(255), _.random(255), _.random(255)];
@@ -185,11 +186,13 @@ var factory = (function () {
            function () { init.call(this); } :
            function () {};
 
-        var color = options.color;
+        var color = options.color = options.color || options.colour;
         // set the color randomly if none is provided
         if (typeof color !== 'object' || color.length !== 3) {
           options.color = [_.random(255), _.random(255), _.random(255)];
         }
+
+        options.colorFn = options.colorFn || options.colourFn;
 
         types[type].prototype = new baseCA();
         types[type].prototype.constructor = types[type];

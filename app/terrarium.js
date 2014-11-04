@@ -16,9 +16,13 @@ var dom = require('./dom.js');
  *                                    "background" option is required if trails is set
  *   @param {array} background      an RGB triplet for the canvas' background
  */
-function Terrarium(width, height, options) {
+function Terrarium (width, height, options) {
+  var cellSize, neighborhood;
   options = options || {};
-  var cellSize = options.cellSize || 10;
+  cellSize = options.cellSize || 10;
+  neighborhood = options.neighborhood || options.neighbourhood;
+  if (typeof neighborhood === 'string') neighborhood = neighborhood.toLowerCase();
+
   this.width = width;
   this.height = height;
   this.cellSize = cellSize;
@@ -28,6 +32,7 @@ function Terrarium(width, height, options) {
   this.grid = [];
   this.nextFrame = false;
   this.hasChanged = false;
+  this.getNeighborCoords = _.getNeighborCoordsFn(width, height, neighborhood === 'vonneumann', options.periodic);
 }
 
 /**
@@ -110,7 +115,7 @@ Terrarium.prototype.step = function (steps) {
   function processCreaturesInner (creature, x, y) {
     if (creature) {
       var neighbors = _.map(
-        _.getNeighborCoords(x, y, gridWidth - 1, gridHeight - 1, creature.actionRadius),
+        self.getNeighborCoords(x, y, creature.actionRadius),
         zipCoordsWithNeighbors
       );
       var result = creature.process(neighbors, x, y);
