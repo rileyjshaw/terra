@@ -168,8 +168,8 @@ var factory = (function () {
           types[type].prototype[key] = value;
         });
 
-        types[type].prototype.successFn = types[type].wait;
-        types[type].prototype.failureFn = types[type].wait;
+        types[type].prototype.successFn = types[type].prototype.wait;
+        types[type].prototype.failureFn = types[type].prototype.wait;
         types[type].prototype.energy = options.initialEnergy;
 
         return true;

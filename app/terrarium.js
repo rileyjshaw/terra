@@ -131,7 +131,7 @@ Terrarium.prototype.step = function (steps) {
           y: y,
           creature: returnedCreature
         });
-        if (!self.hasChanged && returnedCreature.observed) self.hasChanged = true;
+        if (!self.hasChanged && result.observed) self.hasChanged = true;
       } else {
         if (result && !self.hasChanged) self.hasChanged = true;
         processLoser(creature);
@@ -241,6 +241,15 @@ Terrarium.prototype.animate = function (steps, fn) {
 Terrarium.prototype.stop = function () {
   cancelAnimationFrame(this.nextFrame);
   this.nextFrame = false;
+};
+
+/**
+ * Stops any currently running animation and cleans up the DOM
+ */
+Terrarium.prototype.destroy = function () {
+  var canvas = this.canvas;
+  this.stop();
+  canvas.parentNode.removeChild(canvas);
 };
 
 module.exports = Terrarium;
