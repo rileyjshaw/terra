@@ -260,12 +260,12 @@ var createCanvasElement = function (width, height, cellSize, id, insertAfter, ba
 
   // Creates a scaled-up canvas based on the device's
   // resolution, then displays it properly using styles
-  function createHDCanvas (ratio) {
+  function createHDCanvas () {
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
 
     // Creates a dummy canvas to test device's pixel ratio
-    ratio = (function () {
+    var ratio = (function () {
       var ctx = document.createElement('canvas').getContext('2d');
       var dpr = window.devicePixelRatio || 1;
       var bsr = ctx.webkitBackingStorePixelRatio ||
@@ -280,7 +280,7 @@ var createCanvasElement = function (width, height, cellSize, id, insertAfter, ba
     canvas.height = height * ratio;
     canvas.style.width = width + 'px';
     canvas.style.height = height + 'px';
-    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.scale(ratio, ratio);
     ctx.font = 'bold ' + cellSize + 'px Arial';
 
     if (id) canvas.id = id;
