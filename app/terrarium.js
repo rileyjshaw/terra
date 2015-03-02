@@ -18,6 +18,12 @@ var dom = require('./dom.js');
  */
 function Terrarium (width, height, options) {
   var cellSize, neighborhood;
+
+  // cast width and height to integers
+  width = Math.ceil(width);
+  height = Math.ceil(height);
+
+  // set default options
   options = options || {};
   cellSize = options.cellSize || 10;
   neighborhood = options.neighborhood || options.neighbourhood;
