@@ -198,7 +198,7 @@ elementary.animate();</code></pre>
     <p>The following methods and attributes can be passed in an object as the first argument:</p>
     <h3 id="creatureOptions">Required</h3>
     <ul class="defaults">
-      <li>
+      <li id="type">
         <h4><span class="token keyword">string</span> type</h4>
         <p>Creature type, to be used later in <a data-scroll href="#terrariumMethods" class="token function">makeGrid( )</a> or <a data-scroll href="#terrariumMethods" class="token function">makeGridWithDistribution( )</a>.</p>
       </li>
@@ -213,14 +213,14 @@ elementary.animate();</code></pre>
           <li>Default: 1</li>
         </ul>
       </li>
-      <li>
+      <li id="character">
         <h4><span class="token keyword">char</span> character</h4>
         <p>ASCII character used to visually represent a creature.</p>
         <ul>
           <li>Default: undefined (fills cell)</li>
         </ul>
       </li>
-      <li>
+      <li id="color">
         <h4><span class="token keyword">int [3]</span> color</h4>
         <p>RGB components of a creature's display color.</p>
         <ul>
@@ -228,14 +228,14 @@ elementary.animate();</code></pre>
           <li>Default: random</li>
         </ul>
       </li>
-      <li>
+      <li id="colorFn">
         <h4><span class="token keyword">function</span> colorFn</h4>
         <p>How a creature's color is determined at each step.</p>
         <ul>
           <li>Returns: <span class="mono"><span class="token keyword">string</span></span> of comma-separated RGBA components.</li>
         </ul>
       </li>
-      <li>
+      <li id="efficiency">
         <h4><span class="token keyword">int</span> efficiency</h4>
         <p>Conversion ratio of food to energy. Food energy &times; efficiency = gained energy.</p>
         <ul>
@@ -250,7 +250,7 @@ elementary.animate();</code></pre>
           <li>Default: 50</li>
         </ul>
       </li>
-      <li>
+      <li id="isDead">
         <h4><span class="token keyword">function</span> isDead</h4>
         <p>Determines whether a creature should be removed at the beginning of a step.</p>
         <ul>
@@ -266,7 +266,7 @@ elementary.animate();</code></pre>
           <li>Minimum: 0</li>
         </ul>
       </li>
-      <li>
+      <li id="move">
         <h4><span class="token keyword">function</span> move</h4>
         <p>How a creature moves.</p>
         <ul>
@@ -275,7 +275,7 @@ elementary.animate();</code></pre>
           <li>Returns: <span class="mono">{x, y, creature, successFn} || false</span></li>
         </ul>
       </li>
-      <li>
+      <li id="moveLv">
         <h4><span class="token keyword">float</span> moveLv</h4>
         <p></p>
         <ul>
@@ -299,7 +299,7 @@ elementary.animate();</code></pre>
           </li>
         </ul>
       </li>
-      <li>
+      <li id="reproduce">
         <h4><span class="token keyword">function</span> reproduce</h4>
         <p>How a creature reproduces.</p>
         <ul>
@@ -308,7 +308,7 @@ elementary.animate();</code></pre>
           <li>Returns: <span class="mono">{x, y, creature, successFn, failureFn} || false</span></li>
         </ul>
       </li>
-      <li>
+      <li id="reproduceLv">
         <h4><span class="token keyword">float</span> reproduceLv</h4>
         <p>Percentage of a creature's max energy above which it will reproduce (used in the default <a data-scroll href="#process">process</a> method).</p>
         <ul>
@@ -316,14 +316,14 @@ elementary.animate();</code></pre>
           <li>Range: [0, 1]</li>
         </ul>
       </li>
-      <li>
+      <li id="size">
         <h4><span class="token keyword">int</span> size</h4>
         <p>A creature's size; by default, creatures can only eat creatures smaller than them.</p>
         <ul>
           <li>Default: 50</li>
         </ul>
       </li>
-      <li>
+      <li id="sustainability">
         <h4><span class="token keyword">int</span> sustainability</h4>
         <p>Number of visible food sources needed before a creature will eat.</p>
         <ul>
@@ -331,7 +331,7 @@ elementary.animate();</code></pre>
           <li>Range: (0, 16 &times; <a data-scroll href="#actionRadius">actionRadius</a> - 8]</li>
         </ul>
       </li>
-      <li>
+      <li id="wait">
         <h4><span class="token keyword">function</span> wait</h4>
         <p>What happens when a creature waits.</p>
         <ul>
@@ -361,50 +361,50 @@ var t = new terra.Terrarium(4, 4, {
 });</code></pre>
     <h3>Required</h3>
     <ul class="defaults">
-      <li>
+      <li id="width">
         <h4><span class="token keyword">int</span> width</h4>
         <p>Number of cells in the x-direction.</p>
       </li>
-      <li>
+      <li id="height">
         <h4><span class="token keyword">int</span> height</h4>
         <p>Number of cells in the y-direction.</p>
       </li>
     </ul>
     <h3>Optional</h3>
     <ul class="defaults">
-      <li>
+      <li id="id">
         <h4><span class="token keyword">string</span> id</h4>
         <p>id assigned to the generated canvas.</p>
       </li>
-      <li>
+      <li id="cellSize">
         <h4><span class="token keyword">int</span> cellSize</h4>
         <p>Pixel width of each cell.</p>
         <ul>
           <li>Default: 10</li>
         </ul>
       </li>
-      <li>
+      <li id="insertAfter">
         <h4><span class="token keyword">string</span> insertAfter</h4>
         <p>id of the element to insert the canvas after.</p>
         <ul>
           <li>Default: canvas is appended to <code class="language-markup">document.body</code></li>
         </ul>
       </li>
-      <li>
+      <li id="periodic">
         <h4><span class="token keyword">boolean</span> periodic</h4>
         <p>Determines if boundaries wrap around; a creature at the top of a periodic map would see the bottom cells as though they were adjacent.</p>
         <ul>
           <li>Default: false</li>
         </ul>
       </li>
-      <li>
+      <li id="neighborhood">
         <h4><span class="token keyword">string</span> neighborhood</h4>
         <p>Defines neighborhood type as either <a href="http://en.wikipedia.org/wiki/Moore_neighborhood"><code class="language-javascript">moore</code></a> or <a href="http://en.wikipedia.org/wiki/Von_Neumann_neighborhood"><code class="language-javascript">vonNeumann</code></a>.</p>
         <ul>
           <li>Default: moore</li>
         </ul>
       </li>
-      <li>
+      <li id="trails">
         <h4><span class="token keyword">float</span> trails</h4>
         <p>Allows for "trails", which visualize system history. A value of 1 shows all past state; trails fade faster as we approach 0.</p>
         <ul>
@@ -413,7 +413,7 @@ var t = new terra.Terrarium(4, 4, {
           <li>Dependencies: "background" option is required if trails is set.</li>
         </ul>
       </li>
-      <li>
+      <li id="background">
         <h4><span class="token keyword">int [3]</span> background</h4>
         <p>RGB components of the canvas' background.</p>
         <ul>
