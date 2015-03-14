@@ -34,7 +34,7 @@
     <h3>Including terra</h3>
     <p>Getting started is as easy as including the script!</p>
     <pre><code class="language-markup">&lt;script src="//cdn.jsdelivr.net/terra/latest/mainfile"&gt;&lt;/script&gt;</code></pre>
-    <p>terra can also be used as a module with most popular module systems: <a class="question" target="_blank" href="https://github.com/umdjs/umd">?</a></p>
+    <p>terra can also be used as a module with most popular module systems:&nbsp;&nbsp;<a class="question" target="_blank" href="https://github.com/umdjs/umd">?</a></p>
     <pre><code class="language-javascript">// CommonJS
 var terra = require('./terra.min.js');
 // ...
@@ -65,8 +65,19 @@ window.terra;</code></pre>
     <p>We've just created a purple creature that only eats if 6 or more plants are around it. These creatures basically seek out an edge or corner and die there.</p>
 
     <h3>Creating the environment</h3>
-    <p>To run a simulation, we'll need to create an environment. Let's make a 25x25 grid, populate 10% of the space with our lonely purple creature, and fill the rest with simple plants.</p>
-    <pre><code class="language-javascript">var ex1 = new terra.Terrarium(25, 25, {id: 'ex1'});
+    <p>To run a simulation, we'll need to create an environment. Let's make a 25x25 grid, populate 10% of the space with our lonely purple creature, and fill the rest with simple plants. We'll have to define a <code class="language-javascript">simplePlant</code> creature, but don't worry too much about how that works just yet.</p>
+    <pre><code class="language-javascript">// create a simple plant creature
+factory.registerCreature({
+  type: 'simplePlant',
+  color: [166, 226, 46],
+  size: 10,
+  reproduceLv: 0.8,
+  wait: function() { this.energy += 3; },
+  move: false
+});
+
+// initialize our environment with a 10% of our lonely creature
+var ex1 = new terra.Terrarium(25, 25, {id: 'ex1'});
 ex1.grid = ex1.makeGridWithDistribution([['secondCreature', 10], ['simplePlant', 90]]);</code></pre>
 
     <h3>Running a simulation</h3>
@@ -78,7 +89,7 @@ ex1.grid = ex1.makeGridWithDistribution([['secondCreature', 10], ['simplePlant',
 
     <h2 id="examples">Examples</h2>
 
-    <h3 id="gol">Conway's Game of Life <a class="question" target="_blank" href="http://en.wikipedia.org/wiki/Conway's_Game_of_Life">?</a></h3>
+    <h3 id="gol">Conway's Game of Life&nbsp;&nbsp;<a class="question" target="_blank" href="http://en.wikipedia.org/wiki/Conway's_Game_of_Life">?</a></h3>
     <pre><code class="language-javascript">var gameOfLife = new terra.Terrarium(25, 25, {
   trails: 0.9,
   periodic: true,
@@ -102,7 +113,7 @@ terra.registerCA({
 gameOfLife.grid = gameOfLife.makeGrid('GoL');
 gameOfLife.animate();</code></pre>
 
-    <h3 id="cyclic">Cyclic Cellular Automaton <a class="question" target="_blank" href="http://en.wikipedia.org/wiki/Cyclic_cellular_automaton">?</a></h3>
+    <h3 id="cyclic">Cyclic Cellular Automaton&nbsp;&nbsp;<a class="question" target="_blank" href="http://en.wikipedia.org/wiki/Cyclic_cellular_automaton">?</a></h3>
     <pre><code class="language-javascript">var cyclic = new terra.Terrarium(100, 100);
 
 terra.registerCA({
