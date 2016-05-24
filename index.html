@@ -67,7 +67,7 @@ window.terra;</code></pre>
     <h3>Creating the environment</h3>
     <p>To run a simulation, we'll need to create an environment. Let's make a 25x25 grid, populate 10% of the space with our lonely purple creature, and fill the rest with simple plants. We'll have to define a <code class="language-javascript">simplePlant</code> creature, but don't worry too much about how that works just yet.</p>
     <pre><code class="language-javascript">// create a simple plant creature
-factory.registerCreature({
+terra.registerCreature({
   type: 'simplePlant',
   color: [166, 226, 46],
   size: 10,
